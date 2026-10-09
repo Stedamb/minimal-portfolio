@@ -1,7 +1,8 @@
 .cursor-dot,
 .cursor-dot-outline {
     pointer-events: none;
-    position: absolute;
+    /* Fixed + clientX/Y keeps the cursor under the pointer while scrolling. */
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);

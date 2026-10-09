@@ -6,7 +6,7 @@ export default {
     colors: {
       primary: "var(--primary)",
       secondary: "var(--secondary)",
-      tertairy: "var(--tertairy)",
+      tertiary: "var(--tertiary)",
       text: "var(--text)",
       background: "var(--background)",
       accent: "var(--accent)",

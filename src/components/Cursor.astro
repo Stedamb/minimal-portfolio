@@ -1,0 +1,66 @@
+<div class="cursor-dot-outline" data-cursor-outline></div>
+<div class="cursor-dot" data-cursor-dot></div>
+
+<script>
+  // Share of the remaining distance the outline covers each frame (1 = no trailing).
+  const OUTLINE_EASING = 0.5;
+
+  const dot = document.querySelector<HTMLElement>('[data-cursor-dot]');
+  const outline = document.querySelector<HTMLElement>('[data-cursor-outline]');
+
+  if (dot && outline) {
+    let targetX = window.innerWidth / 2;
+    let targetY = window.innerHeight / 2;
+    let outlineX = 0;
+    let outlineY = 0;
+
+    const setVisible = (visible: boolean) => {
+      dot.classList.toggle('hide', !visible);
+      outline.classList.toggle('hide', !visible);
+    };
+
+    // Looked up on every event so the state follows class changes made by other scripts
+    // (e.g. a gallery video going fullscreen). The play/pause icon shows the action a
+    // click will perform, so a playing video shows "pause".
+    const updateHoverState = (event: MouseEvent) => {
+      const target = event.target instanceof Element ? event.target : null;
+      const playPause = target?.closest('.cursor-hover.play-pause');
+      const fullscreen = target?.closest('.cursor-hover.cursor-fullscreen');
+
+      dot.classList.toggle('hovering', !!playPause);
+      outline.classList.toggle('hovering', !!playPause);
+      dot.classList.toggle('fullscreen', !!fullscreen);
+
+      if (playPause) {
+        const video = playPause instanceof HTMLVideoElement ? playPause : playPause.querySelector('video');
+        const playing = !!video && !video.paused;
+        dot.classList.toggle('pause', playing);
+        dot.classList.toggle('play', !playing);
+      }
+    };
+
+    window.addEventListener('mousemove', (event) => {
+      targetX = event.clientX;
+      targetY = event.clientY;
+      dot.style.left = `${targetX}px`;
+      dot.style.top = `${targetY}px`;
+      setVisible(true);
+    });
+    document.addEventListener('mouseover', updateHoverState);
+    // Document listeners run after the element's own click handlers, so the video state is fresh.
+    document.addEventListener('click', updateHoverState);
+    document.addEventListener('mousedown', () => outline.classList.add('clicking'));
+    document.addEventListener('mouseup', () => outline.classList.remove('clicking'));
+    document.addEventListener('mouseenter', () => setVisible(true));
+    document.addEventListener('mouseleave', () => setVisible(false));
+
+    const animateOutline = () => {
+      outlineX += (targetX - outlineX) * OUTLINE_EASING;
+      outlineY += (targetY - outlineY) * OUTLINE_EASING;
+      outline.style.left = `${outlineX}px`;
+      outline.style.top = `${outlineY}px`;
+      requestAnimationFrame(animateOutline);
+    };
+    requestAnimationFrame(animateOutline);
+  }
+</script>

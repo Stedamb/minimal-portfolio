@@ -1,0 +1,16 @@
+---
+import ArrowLink from '../ArrowLink.astro';
+---
+
+<div class="NavSection container-xl pb-20">
+  <div class="relative flex items-start justify-between gap-4 lg:gap-20">
+    <div class="Staggered relative flex flex-col flex-grow lg:w-1/2 p-4 lg:p-8 bg-background border border-text">
+      <h4>Guarda tutti i progetti</h4>
+      <ArrowLink href="/portfolio" label="Portfolio" class="justify-center ml-auto" />
+    </div>
+    <div class="Staggered relative flex flex-col flex-grow lg:w-1/2 p-4 lg:p-8 bg-background border border-text">
+      <h4>Contattami</h4>
+      <ArrowLink href="/info" label="Contatti" class="justify-center ml-auto" />
+    </div>
+  </div>
+</div>

@@ -1,0 +1,52 @@
+---
+interface Props {
+  items: string[];
+}
+
+const { items } = Astro.props;
+---
+
+<div class="scrolling-banner py-16">
+  <div class="text-container" data-marquee>
+    <div class="scrolling-text">
+      <div class="flex">
+        {
+          items.map((item) => (
+            <span class="flex gap-5 pl-5">
+              {item} <img src="/asterisk.svg" class="w-3" alt="" />
+            </span>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // The CSS animation shifts the row by exactly one strip width and loops, so the next copy
+  // lands where the first started. Here we add enough copies to always fill the viewport.
+  document.querySelectorAll<HTMLElement>('[data-marquee]').forEach((container) => {
+    const strip = container.firstElementChild as HTMLElement;
+
+    const fill = () => {
+      const stripWidth = strip.offsetWidth;
+      if (!stripWidth) return;
+      const needed = Math.ceil(window.innerWidth / stripWidth) + 1;
+      while (container.children.length < needed) {
+        const copy = strip.cloneNode(true) as HTMLElement;
+        copy.setAttribute('aria-hidden', 'true');
+        container.append(copy);
+      }
+      container.style.setProperty('--strip-width', `${stripWidth}px`);
+    };
+
+    // Measure after web fonts load, otherwise the fallback font width is used.
+    document.fonts.ready.then(fill);
+
+    let resizeTimeout: ReturnType<typeof setTimeout> | undefined;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(fill, 200);
+    });
+  });
+</script>

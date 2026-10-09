@@ -1,35 +1,16 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
-import Header from '../components/Header';
-import Homepage from '../components/Homepage';
-
-const projects = [
-  {
-    title: 'Supernova',
-    description: 'Description for video 1',
-    source: '/supernova.mp4',
-    link: '/projects/supernova',
-    preview: 'Preview for video 1',
-  },
-  {
-    title: 'Video 2',
-    description: 'Description for video 2',
-    source: '/supernova.mp4',
-    link: '/video2',
-    preview: 'Preview for video 2',
-  },
-  {
-    title: 'Video 3',
-    description: 'Description for video 3',
-    source: '/supernova.mp4',
-    link: '/video3',
-    preview: 'Preview for video 3',
-  },
-];
+import Header from '../components/Header.astro';
+import ContentSection from '../components/sections/ContentSection.astro';
+import NavSection from '../components/sections/NavSection.astro';
+import { featuredProjects } from '../data/projects';
+import { profile } from '../data/profile';
 ---
+
 <PageLayout title="Home" showLoader>
-  <Header slot="header" client:visible />
+  <Header slot="header" video={profile.heroVideo} marquee={profile.clients} />
   <main>
-    <Homepage projects={projects} client:visible />
+    {featuredProjects.map((project, index) => <ContentSection project={project} isRight={index % 2 !== 0} />)}
+    <NavSection />
   </main>
 </PageLayout>

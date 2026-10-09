@@ -1,0 +1,26 @@
+---
+import LazyVideo from '../LazyVideo.astro';
+import type { Project } from '../../data/projects';
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+const [cover] = project.videos;
+// The whole card is one link, so the title must not be another <a> (anchors cannot nest).
+---
+
+<div class="ProjectSection container-xl border-b-[1px] lg:pb-20 mb-20">
+  <a class="Overlink block" href={`/projects/${project.slug}`}>
+    <div class="relative lg:h-[500px] flex items-start justify-center flex-col">
+      <div class="lazyload lg:w-3/5 h-full lg:ml-auto">
+        <LazyVideo video={cover} class="Video object-cover" />
+      </div>
+      <div class="flex flex-col py-4 lg:absolute lg:right-[55%] z-10">
+        <div class="Link-Alt lg:px-8"><h2>{project.title}</h2></div>
+        <p class="font-secondary lg:px-10">{project.date}</p>
+      </div>
+    </div>
+  </a>
+</div>

@@ -1,0 +1,75 @@
+---
+import LazyVideo from './LazyVideo.astro';
+import ArrowLink from './ArrowLink.astro';
+import type { Project } from '../data/projects';
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+---
+
+<div class="flex flex-col lg:flex-row justify-center container-xl gap-6 lg:gap-20 pb-6 lg:pb-20">
+  <div class="lg:w-1/2 h-fit relative border border-text p-8">
+    <h3 class="absolute bottom-full left-8 translate-y-3">{project.title}</h3>
+    <p class="font-secondary pb-4">{project.client} · {project.role} · {project.date}</p>
+    <p>{project.description}</p>
+    {project.credits && <p class="pt-4"><small>{project.credits}</small></p>}
+    {
+      project.externalLink && (
+        <ArrowLink
+          href={project.externalLink.href}
+          label={project.externalLink.label}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="justify-end w-full"
+        />
+      )
+    }
+  </div>
+  <div class="lg:w-1/2 flex flex-col gap-6">
+    {
+      project.videos.map((video) => (
+        <div class="cursor-hover cursor-fullscreen transition-all duration-500 lazyload h-[200px] lg:h-[400px]" data-gallery-item>
+          <LazyVideo video={video} />
+          <button type="button" class="hidden text-background Link-Alt fixed top-10 right-10 z-50" data-gallery-close>
+            Chiudi
+          </button>
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  const INLINE_CLASSES = ['lazyload', 'h-[200px]', 'lg:h-[400px]', 'cursor-hover', 'cursor-fullscreen'];
+  const FULLSCREEN_CLASSES = ['fixed', 'inset-0', 'w-screen', 'h-screen', 'bg-text', 'z-50', 'flex', 'items-center', 'justify-center'];
+
+  let openItem: HTMLElement | null = null;
+
+  const setFullscreen = (item: HTMLElement, fullscreen: boolean) => {
+    item.classList.remove(...(fullscreen ? INLINE_CLASSES : FULLSCREEN_CLASSES));
+    item.classList.add(...(fullscreen ? FULLSCREEN_CLASSES : INLINE_CLASSES));
+    item.querySelector('video')!.controls = fullscreen;
+    item.querySelector('[data-gallery-close]')!.classList.toggle('hidden', !fullscreen);
+    openItem = fullscreen ? item : null;
+    document.dispatchEvent(new CustomEvent('scroll-lock', { detail: fullscreen }));
+  };
+
+  document.querySelectorAll<HTMLElement>('[data-gallery-item]').forEach((item) => {
+    item.addEventListener('click', (event) => {
+      if ((event.target as Element).closest('[data-gallery-close]')) {
+        setFullscreen(item, false);
+      } else if (openItem !== item) {
+        // While open, clicks belong to the native video controls.
+        if (openItem) setFullscreen(openItem, false);
+        setFullscreen(item, true);
+      }
+    });
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && openItem) setFullscreen(openItem, false);
+  });
+</script>

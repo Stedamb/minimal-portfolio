@@ -1,11 +1,25 @@
 .scrolling-banner {
     white-space: nowrap;
     box-sizing: border-box;
-  overflow: hidden;;
+    overflow: hidden;
 }
 
 .text-container {
     display: inline-block;
+    /* --strip-width is set by MovingText.astro once the text has been measured. */
+    animation: marquee 10s linear infinite;
+}
+
+@keyframes marquee {
+    to {
+        transform: translateX(calc(-1 * var(--strip-width, 0px)));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .text-container {
+        animation: none;
+    }
 }
 
 .scrolling-text {

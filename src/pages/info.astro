@@ -1,19 +1,10 @@
 ---
-import PageLayout from "../layouts/PageLayout.astro";
-import Contact from "../components/Contact";
-
-const contacts = 
-    {
-      name: "Vladimir Bertozzi",
-      bio: "Description for video 1",
-      email: "vlvideos@gmail.com",
-      phone: "3294358371" ,
-      img: "/supernova.mp4",
-    };
+import PageLayout from '../layouts/PageLayout.astro';
+import Contact from '../components/Contact.astro';
 ---
-<PageLayout title="Contatti">
-	<main>
-		<Contact contacts={contacts} client:visible />
-	</main>
-</PageLayout>
 
+<PageLayout title="Contatti">
+  <main>
+    <Contact />
+  </main>
+</PageLayout>

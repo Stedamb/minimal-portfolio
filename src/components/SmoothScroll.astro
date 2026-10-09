@@ -1,0 +1,15 @@
+<script>
+  import Lenis from 'lenis';
+  import 'lenis/dist/lenis.css';
+
+  // Respect users who asked for less motion: keep native scrolling for them.
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const lenis = new Lenis({ autoRaf: true, anchors: true });
+
+    // Other scripts lock scrolling (e.g. a fullscreen gallery video) without importing Lenis.
+    document.addEventListener('scroll-lock', (event) => {
+      if ((event as CustomEvent<boolean>).detail) lenis.stop();
+      else lenis.start();
+    });
+  }
+</script>

@@ -1,0 +1,28 @@
+---
+import LazyVideo from './LazyVideo.astro';
+import MovingText from './sections/MovingText.astro';
+import type { Video } from '../data/projects';
+
+interface Props {
+  video: Video;
+  marquee: string[];
+}
+
+const { video, marquee } = Astro.props;
+---
+
+<div>
+  <div class="container-min h-[70vh] lg:h-[80vh] lazyload">
+    <LazyVideo video={video} class="cursor-hover play-pause" data-hero-video />
+  </div>
+  <MovingText items={marquee} />
+</div>
+
+<script>
+  // State is read from the element: the lazy-video observer also plays/pauses it on scroll.
+  document.querySelector<HTMLVideoElement>('video[data-hero-video]')?.addEventListener('click', (event) => {
+    const video = event.currentTarget as HTMLVideoElement;
+    if (video.paused) video.play().catch(() => {});
+    else video.pause();
+  });
+</script>
