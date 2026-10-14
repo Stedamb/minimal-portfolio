@@ -1,15 +1,34 @@
-@import url(./components/infinite-scroll.css);
-@import url(./components/custom-cursor.css);
-@import url(./components/loader.css);
+/* Site styles sit between preflight and utilities: they must beat the base reset (e.g. container margins)
+   but still lose to utility classes, which is how specificity resolved it in v3. */
+@layer theme, base, site, components, utilities;
 
-@import url(./container.css);
-@import url(./multimedia.css);
-@import url(./typography.css);
-@import url(./section.css);
+@import "./components/infinite-scroll.css" layer(site);
+@import "./components/custom-cursor.css" layer(site);
+@import "./components/loader.css" layer(site);
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "./container.css" layer(site);
+@import "./multimedia.css" layer(site);
+@import "./typography.css" layer(site);
+@import "./section.css" layer(site);
+
+@import "tailwindcss";
+
+@theme inline {
+    --color-*: initial;
+    --color-primary: var(--primary);
+    --color-secondary: var(--secondary);
+    --color-tertiary: var(--tertiary);
+    --color-text: var(--text);
+    --color-background: var(--background);
+    --color-accent: var(--accent);
+    --color-shadow: var(--shadow);
+}
+
+@custom-variant 2xl-max (@media (max-width: 1535px));
+@custom-variant xl-max (@media (max-width: 1279px));
+@custom-variant lg-max (@media (max-width: 1023px));
+@custom-variant md-max (@media (max-width: 767px));
+@custom-variant sm-max (@media (max-width: 639px));
 
 :root {
     /* Palette is fixed (no dark variant), so don't let the UA switch form controls to dark. */
