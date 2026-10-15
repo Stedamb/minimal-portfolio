@@ -9,7 +9,7 @@ export const profile = {
   email: 'ciao@example.com',
   phone: '+39 000 000 0000',
   instagram: 'https://www.instagram.com/',
-  photo: '/images/profile-placeholder.jpg',
+  photo: '/images/profile.jpg',
   heroVideo: { src: '/videos/supernova/1.mp4', poster: '/videos/supernova/1-poster.jpg' },
   /** Names scrolling in the homepage marquee. */
   clients: ['Santarcangelo Festival', 'Motus', 'Supernova', 'Blender Studio'],
