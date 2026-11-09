@@ -12,6 +12,7 @@ import { Users } from './collections/Users'
 import { Videos } from './collections/Videos'
 import { Profile } from './globals/Profile'
 import { clientUploadAccess, demoGuard } from './plugins/demo-guard'
+import { mcp } from './plugins/mcp'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -32,6 +33,11 @@ export default buildConfig({
     push: process.env.DATABASE_PUSH === 'true',
     schemaName: process.env.DATABASE_SCHEMA || undefined,
   }),
+  // Vercel runs scheduled publishes from a Vercel Schedule (vercel.json); everywhere else
+  // the app polls itself every minute. Tests drive the queue by hand.
+  jobs: {
+    autoRun: process.env.VERCEL || process.env.NODE_ENV === 'test' ? [] : [{ cron: '* * * * *', limit: 10 }],
+  },
   localization: {
     locales: [
       { code: 'it', label: 'Italiano' },
@@ -49,6 +55,7 @@ export default buildConfig({
       alwaysInsertFields: true,
       clientUploads: { access: clientUploadAccess },
     }),
+    mcp(),
     // Last, so it also covers whatever earlier plugins add (forms, MCP keys, ...).
     demoGuard(),
   ],

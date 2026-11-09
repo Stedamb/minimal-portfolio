@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "schedules": {
+    "payload-jobs": {
+      "schedule": "*/15 * * * *",
+      "path": "/api/payload-jobs/run",
+      "requestMethod": "GET"
+    }
+  }
+}

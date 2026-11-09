@@ -7,7 +7,7 @@ export const MAX_PREFERENCE_BODY_BYTES = 16 * 1024
 // Collections and globals the admin stores list, document and folder preferences for.
 // A test checks every non-system slug of the config is listed here, so a new
 // collection (forms, MCP keys, ...) can't be left out silently.
-export const PREFERENCE_SLUGS = ['users', 'projects', 'images', 'videos', 'profile', 'forms', 'form-submissions'] as const
+export const PREFERENCE_SLUGS = ['users', 'projects', 'images', 'videos', 'profile', 'forms', 'form-submissions', 'payload-mcp-api-keys'] as const
 
 const slug = `(?:${PREFERENCE_SLUGS.join('|')})`
 

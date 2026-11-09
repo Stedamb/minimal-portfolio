@@ -19,6 +19,7 @@
   "dependencies": {
     "@payloadcms/db-postgres": "catalog:",
     "@payloadcms/next": "catalog:",
+    "@payloadcms/plugin-mcp": "catalog:",
     "@payloadcms/richtext-lexical": "catalog:",
     "@payloadcms/storage-vercel-blob": "catalog:",
     "@payloadcms/ui": "catalog:",

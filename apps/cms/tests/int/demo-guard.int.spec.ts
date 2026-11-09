@@ -511,7 +511,7 @@ describe('registration, seed and password reset still work with the guard instal
       expect(users.map((u) => u.role).sort()).toEqual(['demo', 'owner', 'preview', 'submitter'])
       expect((await login('seed-demo@example.com')).status).toBe(200)
       const { user } = await payload.auth({ headers: new Headers({ Authorization: 'users API-Key seed-preview-key' }) })
-      expect(user?.role).toBe('preview')
+      expect((user as { role?: string } | null)?.role).toBe('preview')
     } finally {
       for (const key of ['OWNER_EMAIL', 'OWNER_PASSWORD', 'DEMO_EMAIL', 'DEMO_PASSWORD', 'PREVIEW_API_KEY', 'SUBMITTER_API_KEY']) {
         if (env[key] === undefined) delete process.env[key]

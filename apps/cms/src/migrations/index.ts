@@ -1,6 +1,7 @@
 import * as migration_20261109_175559_initial from './20261109_175559_initial';
 import * as migration_20261109_180220_content_model from './20261109_180220_content_model';
 import * as migration_20261109_193808_demo_guard from './20261109_193808_demo_guard';
+import * as migration_20261109_201109_mcp from './20261109_201109_mcp';
 
 export const migrations = [
   {
@@ -16,6 +17,11 @@ export const migrations = [
   {
     up: migration_20261109_193808_demo_guard.up,
     down: migration_20261109_193808_demo_guard.down,
-    name: '20261109_193808_demo_guard'
+    name: '20261109_193808_demo_guard',
+  },
+  {
+    up: migration_20261109_201109_mcp.up,
+    down: migration_20261109_201109_mcp.down,
+    name: '20261109_201109_mcp'
   },
 ];

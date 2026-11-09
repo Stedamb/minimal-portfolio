@@ -10,6 +10,7 @@ catalog:
   '@payloadcms/db-postgres': 3.93.0
   '@payloadcms/live-preview': 3.93.0
   '@payloadcms/next': 3.93.0
+  '@payloadcms/plugin-mcp': 3.93.0
   '@payloadcms/richtext-lexical': 3.93.0
   '@payloadcms/storage-vercel-blob': 3.93.0
   '@payloadcms/ui': 3.93.0

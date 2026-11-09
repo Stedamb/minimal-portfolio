@@ -97,7 +97,7 @@ describe('users read access', () => {
       context: { assignRole: true },
     })
     const submitter = await viaApiKey(keys.submitter)
-    expect(submitter.role).toBe('submitter')
+    expect((submitter as { role?: string }).role).toBe('submitter')
     await expect(payload.find({ collection: 'users', user: submitter, overrideAccess: false })).rejects.toThrow()
   })
 })

@@ -123,7 +123,17 @@ function guardJobs(jobs: Config['jobs']): Config['jobs'] {
 export const clientUploadAccess = ({ req }: { collectionSlug: string; req: { user?: unknown } }): boolean =>
   Boolean(req.user) && !isReadOnlyRole(req.user as { role?: string })
 
-export const demoGuard = (): Plugin => (incoming) => {
+// Plugins run in ascending `order` (default 0), and @payloadcms/plugin-mcp declares 10, so
+// the guard needs a higher one to still run last and cover the keys collection.
+export const DEMO_GUARD_ORDER = 100
+
+export const demoGuard = (): Plugin => {
+  const plugin: Plugin = (incoming) => guard(incoming)
+  plugin.order = DEMO_GUARD_ORDER
+  return plugin
+}
+
+const guard = (incoming: Config): Config => {
   const components = incoming.admin?.components
   return {
     ...incoming,
