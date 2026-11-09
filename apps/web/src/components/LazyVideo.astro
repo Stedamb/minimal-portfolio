@@ -1,19 +1,19 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
-import type { Video } from '../data/projects';
+import type { VideoItem } from '../lib/mappers';
+import { t, type Locale } from '../lib/i18n';
 
 interface Props extends HTMLAttributes<'video'> {
-  video: Video;
+  video: VideoItem;
+  locale: Locale;
 }
 
-const { video, ...rest } = Astro.props;
-const webmSrc = video.src.replace(/\.mp4$/i, '.webm');
+const { video, locale, ...rest } = Astro.props;
 ---
 
 <video data-lazy-video muted loop playsinline preload="none" poster={video.poster} {...rest}>
-  {webmSrc !== video.src && <source src={webmSrc} type="video/webm" />}
-  <source src={video.src} type="video/mp4" />
-  Sorry, your browser doesn't support videos.
+  {video.sources.map((source) => <source src={source.src} type={source.type} />)}
+  {t(locale).videoUnsupported}
 </video>
 
 <script>

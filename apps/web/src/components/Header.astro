@@ -1,19 +1,28 @@
 ---
 import LazyVideo from './LazyVideo.astro';
+import Photo from './Photo.astro';
 import MovingText from './sections/MovingText.astro';
-import type { Video } from '../data/projects';
+import type { MediaItem } from '../lib/mappers';
+import type { Locale } from '../lib/i18n';
 
 interface Props {
-  video: Video;
+  hero?: MediaItem;
   marquee: string[];
+  locale: Locale;
 }
 
-const { video, marquee } = Astro.props;
+const { hero, marquee, locale } = Astro.props;
 ---
 
 <div>
   <div class="container-min h-[70vh] lg:h-[80vh] lazyload">
-    <LazyVideo video={video} class="cursor-hover play-pause" data-hero-video />
+    {
+      hero?.kind === 'video' ? (
+        <LazyVideo video={hero} locale={locale} class="cursor-hover play-pause" data-hero-video />
+      ) : hero ? (
+        <Photo photo={hero} sizes="100vw" loading="eager" />
+      ) : null
+    }
   </div>
   <MovingText items={marquee} />
 </div>

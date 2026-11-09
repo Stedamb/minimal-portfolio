@@ -1,21 +1,22 @@
 ---
-import LazyVideo from '../LazyVideo.astro';
-import type { Project } from '../../data/projects';
+import MediaItem from '../MediaItem.astro';
+import { localePath, type Locale } from '../../lib/i18n';
+import type { ProjectView } from '../../lib/mappers';
 
 interface Props {
-  project: Project;
+  project: ProjectView;
+  locale: Locale;
 }
 
-const { project } = Astro.props;
-const [cover] = project.videos;
+const { project, locale } = Astro.props;
 // The whole card is one link, so the title must not be another <a> (anchors cannot nest).
 ---
 
 <div class="ProjectSection container-xl border-b-[1px] lg:pb-20 mb-20">
-  <a class="Overlink block" href={`/projects/${project.slug}`}>
+  <a class="Overlink block" href={localePath(locale, `/projects/${project.slug}`)}>
     <div class="relative lg:h-[500px] flex items-start justify-center flex-col">
       <div class="lazyload lg:w-3/5 h-full lg:ml-auto">
-        <LazyVideo video={cover} class="Video object-cover" />
+        {project.cover && <MediaItem item={project.cover} locale={locale} class="Video object-cover" sizes="(min-width: 1024px) 60vw, 100vw" />}
       </div>
       <div class="flex flex-col py-4 lg:absolute lg:right-[55%] z-10">
         <div class="Link-Alt lg:px-8"><h2>{project.title}</h2></div>

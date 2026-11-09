@@ -1,17 +1,9 @@
 ---
-import type { GetStaticPaths } from 'astro';
-import PageLayout from '../../layouts/PageLayout.astro';
-import ProjectDetail from '../../components/Project.astro';
-import { projects, type Project } from '../../data/projects';
+import ProjectView from '../../views/ProjectView.astro';
+import { getProject } from '../../lib/payload';
 
-export const getStaticPaths = (() =>
-  projects.map((project) => ({ params: { slug: project.slug }, props: { project } }))) satisfies GetStaticPaths;
-
-const { project } = Astro.props as { project: Project };
+const project = await getProject(Astro.params.slug!, 'it');
+if (!project) Astro.response.status = 404;
 ---
 
-<PageLayout title={project.title} description={project.preview}>
-  <main>
-    <ProjectDetail project={project} />
-  </main>
-</PageLayout>
+<ProjectView locale="it" project={project} />

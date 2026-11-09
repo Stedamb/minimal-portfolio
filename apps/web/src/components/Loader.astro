@@ -1,12 +1,19 @@
 ---
+import { t, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+}
+
 // localStorage key marking that the splash screen has already been shown once.
 const SEEN_KEY = 'splash-seen';
+const { locale } = Astro.props;
 // The is:inline check sits right after the markup so it runs before first paint:
 // returning visitors never see the splash, not even for a frame.
 ---
 
 <div class="loader w-screen h-screen flex items-center justify-center z-50" data-loader={SEEN_KEY}>
-  <h3>LOADING</h3>
+  <h3>{t(locale).loader}</h3>
 </div>
 
 <script is:inline>

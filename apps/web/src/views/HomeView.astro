@@ -1,0 +1,23 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import Header from '../components/Header.astro';
+import ContentSection from '../components/sections/ContentSection.astro';
+import NavSection from '../components/sections/NavSection.astro';
+import { getProfile, getProjects } from '../lib/payload';
+import { t, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const [profile, projects] = await Promise.all([getProfile(locale), getProjects(locale, { featured: true })]);
+---
+
+<PageLayout title={t(locale).titles.home} locale={locale} profile={profile} showLoader>
+  <Header slot="header" hero={profile.hero} marquee={profile.clients} locale={locale} />
+  <main>
+    {projects.map((project, index) => <ContentSection project={project} isRight={index % 2 !== 0} locale={locale} />)}
+    <NavSection locale={locale} />
+  </main>
+</PageLayout>

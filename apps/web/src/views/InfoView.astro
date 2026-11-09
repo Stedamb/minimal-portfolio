@@ -1,0 +1,19 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import Contact from '../components/Contact.astro';
+import { getProfile } from '../lib/payload';
+import { t, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const profile = await getProfile(locale);
+---
+
+<PageLayout title={t(locale).titles.info} locale={locale} profile={profile}>
+  <main>
+    <Contact profile={profile} locale={locale} />
+  </main>
+</PageLayout>

@@ -1,9 +1,17 @@
 ---
-import { profile } from '../data/profile';
+import { t, type Locale } from '../lib/i18n';
+
+interface Props {
+  name: string;
+  locale: Locale;
+}
+
+const { name, locale } = Astro.props;
+const strings = t(locale);
 ---
 
 <div class="w-full flex justify-between border-t-[1px] px-4 py-2">
-  <h5 class="lg-max:hidden">{profile.name}</h5>
-  <h5>Copyright © {new Date().getFullYear()}</h5>
-  <h5>Site design by SD</h5>
+  <h5 class="lg-max:hidden">{name}</h5>
+  <h5>{strings.footer.copyright} © {new Date().getFullYear()}</h5>
+  <h5>{strings.footer.design}</h5>
 </div>

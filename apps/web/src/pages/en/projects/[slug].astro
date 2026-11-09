@@ -1,0 +1,9 @@
+---
+import ProjectView from '../../../views/ProjectView.astro';
+import { getProject } from '../../../lib/payload';
+
+const project = await getProject(Astro.params.slug!, 'en');
+if (!project) Astro.response.status = 404;
+---
+
+<ProjectView locale="en" project={project} />

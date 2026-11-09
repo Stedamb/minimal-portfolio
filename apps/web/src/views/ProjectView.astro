@@ -1,0 +1,31 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import ProjectDetail from '../components/Project.astro';
+import NotFound from '../components/NotFound.astro';
+import { t, type Locale } from '../lib/i18n';
+import type { ProjectView } from '../lib/mappers';
+
+interface Props {
+  locale: Locale;
+  /** Null renders the 404 page; the route sets the status. */
+  project: ProjectView | null;
+}
+
+const { locale, project } = Astro.props;
+---
+
+{
+  project ? (
+    <PageLayout title={project.title} description={project.preview} locale={locale}>
+      <main>
+        <ProjectDetail project={project} locale={locale} />
+      </main>
+    </PageLayout>
+  ) : (
+    <PageLayout title={t(locale).titles.notFound} locale={locale}>
+      <main>
+        <NotFound locale={locale} />
+      </main>
+    </PageLayout>
+  )
+}

@@ -1,16 +1,5 @@
 ---
-import PageLayout from '../layouts/PageLayout.astro';
-import Header from '../components/Header.astro';
-import ContentSection from '../components/sections/ContentSection.astro';
-import NavSection from '../components/sections/NavSection.astro';
-import { featuredProjects } from '../data/projects';
-import { profile } from '../data/profile';
+import HomeView from '../views/HomeView.astro';
 ---
 
-<PageLayout title="Home" showLoader>
-  <Header slot="header" video={profile.heroVideo} marquee={profile.clients} />
-  <main>
-    {featuredProjects.map((project, index) => <ContentSection project={project} isRight={index % 2 !== 0} />)}
-    <NavSection />
-  </main>
-</PageLayout>
+<HomeView locale="it" />

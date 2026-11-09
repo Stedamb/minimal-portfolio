@@ -7,7 +7,8 @@
     "start": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "vitest run"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.12",
@@ -15,9 +16,14 @@
     "astro": "catalog:",
     "lenis": "^1.3.27",
     "tailwindcss": "^4.3.3",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "@astrojs/vercel": "11.0.20",
+    "@repo/shared": "workspace:*"
   },
   "engines": {
     "node": ">=24.22.1"
+  },
+  "devDependencies": {
+    "vitest": "4.1.12"
   }
 }

@@ -1,19 +1,23 @@
 ---
 import LazyVideo from './LazyVideo.astro';
+import Photo from './Photo.astro';
 import ArrowLink from './ArrowLink.astro';
-import type { Project } from '../data/projects';
+import { t, type Locale } from '../lib/i18n';
+import type { ProjectView } from '../lib/mappers';
 
 interface Props {
-  project: Project;
+  project: ProjectView;
+  locale: Locale;
 }
 
-const { project } = Astro.props;
+const { project, locale } = Astro.props;
+const meta = [project.client, project.role, project.date].filter(Boolean).join(' · ');
 ---
 
 <div class="flex flex-col lg:flex-row justify-center container-xl gap-6 lg:gap-20 pb-6 lg:pb-20">
   <div class="lg:w-1/2 h-fit relative border border-text p-8">
     <h3 class="absolute bottom-full left-8 translate-y-3">{project.title}</h3>
-    <p class="font-secondary pb-4">{project.client} · {project.role} · {project.date}</p>
+    <p class="font-secondary pb-4">{meta}</p>
     <p>{project.description}</p>
     {project.credits && <p class="pt-4"><small>{project.credits}</small></p>}
     {
@@ -30,12 +34,24 @@ const { project } = Astro.props;
   </div>
   <div class="lg:w-1/2 flex flex-col gap-6">
     {
-      project.videos.map((video) => (
-        <div class="cursor-hover cursor-fullscreen transition-all duration-500 lazyload h-[200px] lg:h-[400px]" data-gallery-item>
-          <LazyVideo video={video} />
-          <button type="button" class="hidden text-background Link-Alt fixed top-10 right-10 z-50" data-gallery-close>
-            Chiudi
-          </button>
+      project.items.map((item) => (
+        <div class="flex flex-col gap-2">
+          <div class="cursor-hover cursor-fullscreen transition-all duration-500 lazyload h-[200px] lg:h-[400px]" data-gallery-item>
+            {item.kind === 'video' ? (
+              <LazyVideo video={item} locale={locale} />
+            ) : (
+              <Photo photo={item} sizes="(min-width: 1024px) 50vw, 100vw" />
+            )}
+            {item.kind === 'photo' && item.caption && (
+              <p class="hidden fixed bottom-6 inset-x-0 z-50 px-4 text-center text-background" data-gallery-caption>
+                {item.caption}
+              </p>
+            )}
+            <button type="button" class="hidden text-background Link-Alt fixed top-10 right-10 z-50" data-gallery-close>
+              {t(locale).project.close}
+            </button>
+          </div>
+          {item.kind === 'photo' && item.caption && <p><small>{item.caption}</small></p>}
         </div>
       ))
     }
@@ -51,7 +67,12 @@ const { project } = Astro.props;
   const setFullscreen = (item: HTMLElement, fullscreen: boolean) => {
     item.classList.remove(...(fullscreen ? INLINE_CLASSES : FULLSCREEN_CLASSES));
     item.classList.add(...(fullscreen ? FULLSCREEN_CLASSES : INLINE_CLASSES));
-    item.querySelector('video')!.controls = fullscreen;
+    const video = item.querySelector('video');
+    if (video) video.controls = fullscreen;
+    // Photos are shown whole in fullscreen instead of cropped to the inline box.
+    const photo = item.querySelector('img');
+    if (photo) photo.style.objectFit = fullscreen ? 'contain' : '';
+    item.querySelector('[data-gallery-caption]')?.classList.toggle('hidden', !fullscreen);
     item.querySelector('[data-gallery-close]')!.classList.toggle('hidden', !fullscreen);
     openItem = fullscreen ? item : null;
     document.dispatchEvent(new CustomEvent('scroll-lock', { detail: fullscreen }));
