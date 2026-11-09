@@ -139,8 +139,8 @@ afterAll(async () => {
   await payload.destroy()
 })
 
-describe('demo writes are rejected, and nothing is stored (R18)', () => {
-  it('rejects a project title PATCH with 403 and the demo notice, leaving draft, published and versions untouched (AE1)', async () => {
+describe('demo writes are rejected, and nothing is stored', () => {
+  it('rejects a project title PATCH with 403 and the demo notice, leaving draft, published and versions untouched', async () => {
     const before = await snapshot(projectId)
     const res = await rest(`/projects/${projectId}`, { method: 'PATCH', token: tokens.demo, body: { title: 'Hacked' } })
     expect(res.status).toBe(403)
@@ -297,7 +297,7 @@ describe('demo and the jobs queue', () => {
   })
 })
 
-describe('demo account and users (R18, R19)', () => {
+describe('demo account and users', () => {
   it('rejects changing its own password or email and keeps the demo credentials working', async () => {
     const password = await rest(`/users/${demo.id}`, { method: 'PATCH', token: tokens.demo, body: { password: 'changed-password-1' } })
     const email = await rest(`/users/${demo.id}`, { method: 'PATCH', token: tokens.demo, body: { email: 'other@example.com' } })
@@ -336,7 +336,7 @@ describe('demo account and users (R18, R19)', () => {
   })
 })
 
-describe('what the demo can still do (R17)', () => {
+describe('what the demo can still do', () => {
   it('reads projects, drafts and version history', async () => {
     const list = await rest('/projects?draft=true', { token: tokens.demo })
     expect(list.status).toBe(200)
@@ -369,7 +369,7 @@ describe('what the demo can still do (R17)', () => {
   })
 })
 
-describe('locks (R18)', () => {
+describe('locks', () => {
   it('creates no lock when a document is opened, because no document can be locked', async () => {
     expect(payload.config.collections.map((c) => c.slug as string).includes('payload-locked-documents')).toBe(false)
     const res = await rest('/payload-locked-documents', { method: 'POST', token: tokens.demo, body: { document: { relationTo: 'projects', value: projectId } } })
@@ -380,7 +380,7 @@ describe('locks (R18)', () => {
   })
 })
 
-describe('preferences middleware (writes go straight to the database, KTD8)', () => {
+describe('preferences middleware (writes go straight to the database)', () => {
   const call = async (method: string, urlPath: string, body?: string, contentType = 'application/json') => {
     const { NextRequest } = await import('next/server')
     const { proxy } = await import('../../src/proxy')

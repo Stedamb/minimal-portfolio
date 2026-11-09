@@ -2,7 +2,7 @@ packages:
   - apps/*
   - packages/*
 
-# Single source of truth for versions that must move together (KTD1).
+# Single source of truth for versions that must move together.
 # Every @payloadcms/* package pins an exact `payload` peer, so they all use `catalog:`.
 catalog:
   astro: 7.4.2

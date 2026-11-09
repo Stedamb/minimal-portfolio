@@ -46,6 +46,8 @@ flowchart LR
 - **Scheduled publishing**: on Vercel, a Vercel Schedule (`apps/cms/vercel.json`) calls `/api/payload-jobs/run` every 15 minutes. Anywhere else, the CMS polls its own job queue every minute.
 - **Roles**: `owner` (everything), `demo` (the public, read-only login), and two API-key service users: `preview` (lets `web` read drafts for live preview) and `submitter` (lets `web` post contact form submissions).
 
+More detail: [docs/architecture.md](docs/architecture.md) explains each part (the demo guard, caching and purge, live preview, scheduling, the contact form, MCP), and [docs/process.md](docs/process.md) describes how the project was planned, built and reviewed.
+
 ## Try the demo
 
 Open `<cms url>/admin` and sign in with:

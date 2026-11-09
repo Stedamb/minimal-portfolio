@@ -87,7 +87,7 @@ afterAll(async () => {
   await payload.destroy()
 })
 
-describe('a due scheduled publish (AE4)', () => {
+describe('a due scheduled publish', () => {
   it('goes live through one run with the cron secret, and purges the cache', async () => {
     const project = await createDraft()
     await schedule(project.id, aMinuteAgo())

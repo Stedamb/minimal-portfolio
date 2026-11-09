@@ -61,7 +61,7 @@ afterAll(async () => {
 })
 
 describe('projects', () => {
-  it('returns items in the saved order and resolves the first to its image (AE7)', async () => {
+  it('returns items in the saved order and resolves the first to its image', async () => {
     const second = (await createImage({ alt: 'Second' })).id
     const project = await createProject({
       items: [
@@ -80,7 +80,7 @@ describe('projects', () => {
     await expect(createProject({ items: [] })).rejects.toThrow()
   })
 
-  it('serves the Italian description when the English one is missing (AE5)', async () => {
+  it('serves the Italian description when the English one is missing', async () => {
     const project = await createProject({ description: 'Descrizione in italiano' }, { locale: 'it' })
     const en = await payload.findByID({ collection: 'projects', id: project.id, locale: 'en', overrideAccess: true })
     expect(en.description).toBe('Descrizione in italiano')
@@ -104,7 +104,7 @@ describe('projects', () => {
     expect(list.docs.map((d) => d.id)).toContain(project.id)
   })
 
-  it('lets a preview API key read the draft but not change it (KTD9)', async () => {
+  it('lets a preview API key read the draft but not change it', async () => {
     const key = 'test-preview-key-u3'
     await payload.create({
       collection: 'users',

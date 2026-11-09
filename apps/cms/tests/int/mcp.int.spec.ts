@@ -104,7 +104,7 @@ afterAll(async () => {
   await payload.destroy()
 })
 
-describe('who can use the endpoint (AE6)', () => {
+describe('who can use the endpoint', () => {
   it('refuses a request without an Authorization header', async () => {
     const res = await initialize()
     expect(res.status).toBe(401)
