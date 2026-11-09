@@ -12,6 +12,7 @@ import { Users } from './collections/Users'
 import { Videos } from './collections/Videos'
 import { Profile } from './globals/Profile'
 import { clientUploadAccess, demoGuard } from './plugins/demo-guard'
+import { contactForm, contactRateEndpoint } from './plugins/contact-form'
 import { mcp } from './plugins/mcp'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -23,6 +24,7 @@ export default buildConfig({
   },
   collections: [Users, Projects, Images, Videos],
   globals: [Profile],
+  endpoints: [contactRateEndpoint],
   editor: lexicalEditor(),
   db: postgresAdapter({
     pool: {
@@ -55,6 +57,7 @@ export default buildConfig({
       alwaysInsertFields: true,
       clientUploads: { access: clientUploadAccess },
     }),
+    contactForm(),
     mcp(),
     // Last, so it also covers whatever earlier plugins add (forms, MCP keys, ...).
     demoGuard(),

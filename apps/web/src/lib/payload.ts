@@ -1,12 +1,15 @@
-import type { Profile, Project } from '@repo/shared';
+import type { Form, Profile, Project } from '@repo/shared';
 import type { Locale } from './i18n';
-import { mapProfile, mapProject, type MapContext, type ProfileView, type ProjectView } from './mappers';
+import { mapContactForm, mapProfile, mapProject, type ContactFormView, type MapContext, type ProfileView, type ProjectView } from './mappers';
 
 // Thin read-only client for the public Payload REST API. Anonymous requests only see
 // published documents, and `locale` falls back to Italian when a translation is missing.
 
 // Deep enough to populate items -> video -> poster/webm and the profile hero -> poster.
 const DEPTH = '2';
+
+/** Matches the slug the CMS seed gives the contact form. */
+export const CONTACT_FORM_SLUG = 'contact';
 
 const defaultContext = (): MapContext => ({
   cmsUrl: process.env.CMS_URL ?? import.meta.env.CMS_URL ?? 'http://localhost:3000',
@@ -44,6 +47,16 @@ export async function getProject(slug: string, locale: Locale, ctx: MapContext =
 
 export async function getProfile(locale: Locale, ctx: MapContext = defaultContext()): Promise<ProfileView> {
   return mapProfile(await get<Profile>('/api/globals/profile', { locale, depth: DEPTH }, ctx), ctx);
+}
+
+/** The contact form, looked up by its stable slug. Null when the CMS has none (the page then shows the email card). */
+export async function getContactForm(locale: Locale, ctx: MapContext = defaultContext()): Promise<ContactFormView | null> {
+  const { docs } = await get<{ docs: Form[] }>(
+    '/api/forms',
+    { locale, depth: '0', limit: '1', 'where[slug][equals]': CONTACT_FORM_SLUG },
+    ctx,
+  );
+  return docs[0] ? mapContactForm(docs[0]) : null;
 }
 
 // --- Live preview (KTD7) ---------------------------------------------------------------

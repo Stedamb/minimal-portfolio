@@ -1,4 +1,4 @@
-import type { Image, Profile, Project, Video } from '@repo/shared';
+import type { Form, Image, Profile, Project, Video } from '@repo/shared';
 import { mediaTag } from '@repo/shared/cache-tags';
 
 // Converts Payload documents into the plain shapes the components take. Every
@@ -175,5 +175,44 @@ export function mapProfile(doc: Profile, ctx: MapContext): ProfileView {
     phone,
     phoneHref: phone ? `tel:${phone.replace(/[^\d+]/g, '')}` : undefined,
     instagram: safeUrl(doc.contact?.instagram),
+  };
+}
+
+// --- Contact form (KTD11) ---------------------------------------------------------------
+
+export interface ContactFieldView {
+  name: string;
+  label: string;
+  type: 'text' | 'email' | 'textarea';
+  required: boolean;
+}
+
+export interface ContactFormView {
+  id: number | string;
+  fields: ContactFieldView[];
+  submitLabel: string;
+  /** Plain text of the form's confirmation message, when the owner wrote one. */
+  confirmation?: string;
+}
+
+// The Lexical confirmation message flattened to text: paragraphs joined by a space.
+const lexicalText = (node: unknown): string => {
+  if (!node || typeof node !== 'object') return '';
+  const { text, children } = node as { text?: unknown; children?: unknown };
+  if (typeof text === 'string') return text;
+  return Array.isArray(children) ? children.map(lexicalText).join(' ') : '';
+};
+
+export function mapContactForm(form: Form): ContactFormView {
+  return {
+    id: form.id,
+    fields: (form.fields ?? []).map((field) => ({
+      name: field.name,
+      label: field.label || field.name,
+      type: field.blockType,
+      required: Boolean(field.required),
+    })),
+    submitLabel: form.submitButtonLabel || '',
+    confirmation: form.confirmationType === 'message' ? lexicalText(form.confirmationMessage?.root).trim() || undefined : undefined,
   };
 }

@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import type { Payload } from 'payload'
 
 import type { Image, Video } from '../payload-types'
+import { seedContactForm } from './contact-form'
 import { seedUsers } from './users'
 
 const mediaDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'media')
@@ -239,4 +240,7 @@ export async function seed(payload: Payload): Promise<void> {
     })
     log('seed: created profile')
   }
+
+  // 5. The contact form the info page renders.
+  await seedContactForm(payload)
 }

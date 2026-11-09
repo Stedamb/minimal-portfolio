@@ -1,5 +1,10 @@
 ---
+import { actions } from 'astro:actions';
 import InfoView from '../../views/InfoView.astro';
+
+// A post without JavaScript lands here: on success go back to the page with the status anchor.
+const result = Astro.getActionResult(actions.contact)?.data;
+if (result?.status === 'sent') return Astro.redirect(`${Astro.url.pathname}#contact-sent`, 303);
 ---
 
-<InfoView locale="en" />
+<InfoView locale="en" result={result} />

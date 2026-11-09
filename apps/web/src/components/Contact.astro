@@ -2,15 +2,28 @@
 import ArrowLink from './ArrowLink.astro';
 import Photo from './Photo.astro';
 import { t, type Locale } from '../lib/i18n';
-import type { ProfileView } from '../lib/mappers';
+import { HONEYPOT_FIELD, LOCALE_FIELD, TOKEN_FIELD, type ContactResult } from '../lib/form-guard';
+import type { ContactFormView, ProfileView } from '../lib/mappers';
 
 interface Props {
   profile: ProfileView;
   locale: Locale;
+  /** The CMS contact form. Without it the e-mail card is shown instead. */
+  form?: ContactFormView | null;
+  /** Signed render timestamp the Action checks. */
+  token?: string;
+  /** Outcome of a post without JavaScript, to show errors and keep the entered values. */
+  result?: ContactResult;
 }
 
-const { profile, locale } = Astro.props;
+const { profile, locale, form, token = '', result } = Astro.props;
 const strings = t(locale);
+const reasons = { too_fast: strings.form.tooFast, expired: strings.form.expired, rate_limited: strings.form.rateLimited, failed: strings.form.failed };
+const missing = result?.status === 'invalid' ? result.missing : [];
+const values = result && result.status !== 'sent' ? result.values : {};
+const errorMessage = result?.status === 'invalid' ? strings.form.required : result?.status === 'rejected' ? reasons[result.reason] : '';
+const messages = { sending: strings.form.sending, required: strings.form.required, tooFast: strings.form.tooFast, expired: strings.form.expired, rateLimited: strings.form.rateLimited, failed: strings.form.failed };
+const field = 'w-full border border-text bg-background p-2 font-primary';
 ---
 
 <div>
@@ -38,13 +51,49 @@ const strings = t(locale);
   <div class="container-xl pb-20">
     <div class="relative flex items-start justify-between gap-4 lg:gap-20">
       {
-        profile.email && profile.emailHref && (
-          <div class="Staggered relative flex flex-col flex-grow lg:w-1/2 p-4 lg:p-8 bg-background border border-text">
-            <h4>{strings.contact.email}</h4>
-            <h3 class="font-secondary pt-4 lg-max:hidden">{profile.email}</h3>
-            <h4 class="font-secondary pt-4 lg:hidden">{profile.email}</h4>
-            <ArrowLink href={profile.emailHref} label={strings.contact.writeToMe} class="justify-center ml-auto" />
+        form ? (
+          <div
+            data-contact
+            data-messages={JSON.stringify(messages)}
+            class="contact-card Staggered relative flex flex-col flex-grow lg:w-1/2 p-4 lg:p-8 bg-background border border-text"
+          >
+            <h4>{strings.contact.writeToMe}</h4>
+            <p id="contact-sent" class="contact-sent pt-4" role="status" tabindex="-1">
+              {form.confirmation || strings.form.sent}
+            </p>
+            <p id="contact-error" data-contact-error role="alert" hidden={!errorMessage} class="pt-4">
+              {errorMessage}
+            </p>
+            <form method="POST" action="?_action=contact" data-contact-form class="flex flex-col gap-4 pt-4">
+              <input type="hidden" name={LOCALE_FIELD} value={locale} />
+              <input type="hidden" name={TOKEN_FIELD} value={token} />
+              <div class="sr-only" aria-hidden="true">
+                <label>Website <input type="text" name={HONEYPOT_FIELD} tabindex="-1" autocomplete="off" /></label>
+              </div>
+              {form.fields.map((item) => (
+                <label class="flex flex-col gap-1">
+                  <small>{item.label}</small>
+                  {item.type === 'textarea' ? (
+                    <textarea class={field} name={item.name} rows="5" required={item.required} aria-invalid={missing.includes(item.name)} maxlength="5000">{values[item.name]}</textarea>
+                  ) : (
+                    <input class={field} type={item.type} name={item.name} value={values[item.name] ?? ''} required={item.required} aria-invalid={missing.includes(item.name)} maxlength="254" />
+                  )}
+                </label>
+              ))}
+              <button type="submit" class="Link self-end border border-text p-2 px-6 disabled:opacity-50">
+                {form.submitLabel || strings.form.send}
+              </button>
+            </form>
           </div>
+        ) : (
+          profile.email && profile.emailHref && (
+            <div class="Staggered relative flex flex-col flex-grow lg:w-1/2 p-4 lg:p-8 bg-background border border-text">
+              <h4>{strings.contact.email}</h4>
+              <h3 class="font-secondary pt-4 lg-max:hidden">{profile.email}</h3>
+              <h4 class="font-secondary pt-4 lg:hidden">{profile.email}</h4>
+              <ArrowLink href={profile.emailHref} label={strings.contact.writeToMe} class="justify-center ml-auto" />
+            </div>
+          )
         )
       }
       {
@@ -60,3 +109,28 @@ const strings = t(locale);
     </div>
   </div>
 </div>
+
+<style>
+  /* The confirmation shows when the Action redirected back with #contact-sent (no JavaScript)
+     or when the script marks the card as sent; either way the form is replaced by it. */
+  .contact-sent {
+    display: none;
+  }
+  .contact-sent:target,
+  [data-state='sent'] .contact-sent {
+    display: block;
+  }
+  .contact-card:has(.contact-sent:target) form,
+  .contact-card[data-state='sent'] form {
+    display: none;
+  }
+  [aria-invalid='true'] {
+    outline: 2px solid currentColor;
+  }
+</style>
+
+<script>
+  import { initContactForm } from '../scripts/contact-form';
+
+  initContactForm();
+</script>
