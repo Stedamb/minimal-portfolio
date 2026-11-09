@@ -8,5 +8,5 @@
     "noEmit": true,
     "isolatedModules": true
   },
-  "include": ["src/cache-tags.ts", "tests"]
+  "include": ["src/cache-tags.ts", "src/preview-token.ts", "tests"]
 }

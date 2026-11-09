@@ -10,16 +10,18 @@ interface Props {
   locale: Locale;
   /** Null renders the 404 page; the route sets the status. */
   project: ProjectView | null;
+  /** Live preview: render without declaring cache tags. */
+  preview?: boolean;
 }
 
-const { locale, project } = Astro.props;
+const { locale, project, preview = false } = Astro.props;
 // A missing project (404) is not cached, so it shows up as soon as it is published.
-if (project) cachePage(Astro.cache, pageTags.project(project.id, locale), mediaTagsOf(project.items));
+if (project && !preview) cachePage(Astro.cache, pageTags.project(project.id, locale), mediaTagsOf(project.items));
 ---
 
 {
   project ? (
-    <PageLayout title={project.title} description={project.preview} locale={locale}>
+    <PageLayout title={project.title} description={project.preview} locale={locale} preview={preview}>
       <main>
         <ProjectDetail project={project} locale={locale} />
       </main>

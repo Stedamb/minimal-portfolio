@@ -28,10 +28,7 @@ const { hero, marquee, locale } = Astro.props;
 </div>
 
 <script>
-  // State is read from the element: the lazy-video observer also plays/pauses it on scroll.
-  document.querySelector<HTMLVideoElement>('video[data-hero-video]')?.addEventListener('click', (event) => {
-    const video = event.currentTarget as HTMLVideoElement;
-    if (video.paused) video.play().catch(() => {});
-    else video.pause();
-  });
+  import { initHeroVideo } from '../scripts/hero-video';
+
+  initHeroVideo();
 </script>

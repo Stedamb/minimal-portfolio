@@ -5,18 +5,22 @@ import ContentSection from '../components/sections/ContentSection.astro';
 import NavSection from '../components/sections/NavSection.astro';
 import { getProfile, getProjects } from '../lib/payload';
 import { t, type Locale } from '../lib/i18n';
+import type { ProfileView } from '../lib/mappers';
 import { cachePage, mediaTagsOf, pageTags } from '../lib/cache';
 
 interface Props {
   locale: Locale;
+  /** Live preview: the profile to show instead of the published one. The page is never cached. */
+  profile?: ProfileView;
+  preview?: boolean;
 }
 
-const { locale } = Astro.props;
-const [profile, projects] = await Promise.all([getProfile(locale), getProjects(locale, { featured: true })]);
-cachePage(Astro.cache, pageTags.home(locale), mediaTagsOf([profile.photo, profile.hero, ...projects.map((p) => p.cover)]));
+const { locale, preview = false } = Astro.props;
+const [profile, projects] = await Promise.all([Astro.props.profile ?? getProfile(locale), getProjects(locale, { featured: true })]);
+if (!preview) cachePage(Astro.cache, pageTags.home(locale), mediaTagsOf([profile.photo, profile.hero, ...projects.map((p) => p.cover)]));
 ---
 
-<PageLayout title={t(locale).titles.home} locale={locale} profile={profile} showLoader>
+<PageLayout title={t(locale).titles.home} locale={locale} profile={profile} showLoader={!preview} preview={preview}>
   <Header slot="header" hero={profile.hero} marquee={profile.clients} locale={locale} />
   <main>
     {projects.map((project, index) => <ContentSection project={project} isRight={index % 2 !== 0} locale={locale} />)}

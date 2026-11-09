@@ -17,17 +17,7 @@ const { video, locale, ...rest } = Astro.props;
 </video>
 
 <script>
-  // Videos only download and play while at least a quarter of them is on screen.
-  const observer = new IntersectionObserver(
-    (entries) => {
-      for (const { target, isIntersecting } of entries) {
-        const video = target as HTMLVideoElement;
-        if (isIntersecting) video.play().catch(() => {});
-        else video.pause();
-      }
-    },
-    { threshold: 0.25 }
-  );
+  import { initLazyVideos } from '../scripts/lazy-video';
 
-  document.querySelectorAll<HTMLVideoElement>('video[data-lazy-video]').forEach((video) => observer.observe(video));
+  initLazyVideos();
 </script>

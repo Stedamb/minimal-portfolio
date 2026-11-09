@@ -5,7 +5,8 @@
   "version": "0.0.1",
   "exports": {
     ".": "./src/index.ts",
-    "./cache-tags": "./src/cache-tags.ts"
+    "./cache-tags": "./src/cache-tags.ts",
+    "./preview-token": "./src/preview-token.ts"
   },
   "scripts": {
     "test": "vitest run",

@@ -1,0 +1,32 @@
+---
+interface Props {
+  cmsUrl: string;
+}
+
+const { cmsUrl } = Astro.props;
+---
+
+<div hidden data-live-preview data-cms-url={cmsUrl}></div>
+
+<script>
+  import { initCursor } from '../scripts/cursor';
+  import { initGallery } from '../scripts/gallery';
+  import { initHeroVideo } from '../scripts/hero-video';
+  import { initLazyVideos } from '../scripts/lazy-video';
+  import { startLivePreview } from '../scripts/live-preview';
+  import { initMarquee } from '../scripts/marquee';
+
+  const cmsUrl = document.querySelector<HTMLElement>('[data-live-preview]')?.dataset.cmsUrl;
+  if (cmsUrl) {
+    startLivePreview({
+      cmsUrl,
+      afterSwap: () => {
+        initLazyVideos();
+        initHeroVideo();
+        initGallery();
+        initMarquee();
+        initCursor();
+      },
+    });
+  }
+</script>

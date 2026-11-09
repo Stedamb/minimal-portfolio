@@ -45,3 +45,60 @@ export async function getProject(slug: string, locale: Locale, ctx: MapContext =
 export async function getProfile(locale: Locale, ctx: MapContext = defaultContext()): Promise<ProfileView> {
   return mapProfile(await get<Profile>('/api/globals/profile', { locale, depth: DEPTH }, ctx), ctx);
 }
+
+// --- Live preview (KTD7) ---------------------------------------------------------------
+// Drafts are read server-to-server with the read-only `preview` API-key user. The route
+// verifies the preview token before calling any of this, so the key never serves anonymous
+// requests directly.
+
+const envVar = (name: string): string | undefined => process.env[name] ?? (import.meta.env as Record<string, string | undefined>)[name];
+
+async function previewRequest<T>(path: string, params: Record<string, string>, body: unknown, { cmsUrl }: MapContext): Promise<T | null> {
+  const key = envVar('PREVIEW_API_KEY');
+  if (!key) throw new Error('PREVIEW_API_KEY is not set');
+  const url = new URL(path, cmsUrl);
+  for (const [name, value] of Object.entries(params)) url.searchParams.set(name, value);
+  const bypass = envVar('VERCEL_AUTOMATION_BYPASS_SECRET');
+  const response = await fetch(url, {
+    // With a body, Payload merges it into the document (the find endpoint's `data` argument)
+    // and populates relationships at the requested depth, exactly as for a saved draft.
+    method: body ? 'POST' : 'GET',
+    headers: {
+      authorization: `users API-Key ${key}`,
+      ...(bypass ? { 'x-vercel-protection-bypass': bypass } : {}),
+      ...(body ? { 'content-type': 'application/json', 'x-payload-http-method-override': 'GET' } : {}),
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error(`CMS preview request failed: ${response.status} ${url.pathname}`);
+  return (await response.json()) as T;
+}
+
+/** `data` is the admin's unsaved form state. Without it the saved draft is shown. */
+export async function getPreviewProject(
+  id: string,
+  locale: Locale,
+  data?: object,
+  ctx: MapContext = defaultContext(),
+): Promise<ProjectView | null> {
+  const path = `/api/projects/${encodeURIComponent(id)}`;
+  const doc = await previewRequest<Project>(
+    path,
+    data ? {} : { locale, depth: DEPTH, draft: 'true' },
+    data && { data, depth: Number(DEPTH), locale, flattenLocales: false },
+    ctx,
+  );
+  // A merged document carries no id (the form state has none).
+  return doc ? mapProject({ ...doc, id: doc.id ?? (Number.isNaN(Number(id)) ? id : Number(id)) } as Project, ctx) : null;
+}
+
+export async function getPreviewProfile(locale: Locale, data?: object, ctx: MapContext = defaultContext()): Promise<ProfileView | null> {
+  const doc = await previewRequest<Profile>(
+    '/api/globals/profile',
+    data ? {} : { locale, depth: DEPTH, draft: 'true' },
+    data && { data, depth: Number(DEPTH), locale, flattenLocales: false },
+    ctx,
+  );
+  return doc ? mapProfile(doc, ctx) : null;
+}

@@ -3,10 +3,12 @@ import type { GlobalConfig } from 'payload'
 import { readPublished } from '../access/published'
 import { isOwnerOrDemo } from '../access/roles'
 import { purgeProfileChange } from '../hooks/purge'
+import { profileLivePreview } from '../preview/live-preview'
 
 export const Profile: GlobalConfig = {
   slug: 'profile',
   lockDocuments: false,
+  admin: { livePreview: profileLivePreview },
   hooks: { afterChange: [purgeProfileChange] },
   versions: {
     max: 50,

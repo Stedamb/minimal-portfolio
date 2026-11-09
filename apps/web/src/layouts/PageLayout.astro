@@ -5,6 +5,7 @@ import Footer from '../components/Footer.astro';
 import Loader from '../components/Loader.astro';
 import Cursor from '../components/Cursor.astro';
 import SmoothScroll from '../components/SmoothScroll.astro';
+import PreviewBridge from '../components/PreviewBridge.astro';
 import { getProfile } from '../lib/payload';
 import type { ProfileView } from '../lib/mappers';
 import type { Locale } from '../lib/i18n';
@@ -18,9 +19,12 @@ interface Props {
   showLoader?: boolean;
   /** Pass the profile when the page already loaded it, to avoid a second request. */
   profile?: ProfileView;
+  /** Live preview frame: loads the script that receives the admin's unsaved edits. */
+  preview?: boolean;
 }
 
-const { title, locale, showLoader = false } = Astro.props;
+const { title, locale, showLoader = false, preview = false } = Astro.props;
+const cmsUrl = process.env.CMS_URL ?? import.meta.env.CMS_URL ?? 'http://localhost:3000';
 const profile = Astro.props.profile ?? (await getProfile(locale));
 const description = Astro.props.description || [profile.name, profile.role].filter(Boolean).join(', ');
 ---
@@ -47,5 +51,6 @@ const description = Astro.props.description || [profile.name, profile.role].filt
     </header>
     <slot />
     <footer><Footer name={profile.name} locale={locale} /></footer>
+    {preview && <PreviewBridge cmsUrl={cmsUrl} />}
   </body>
 </html>

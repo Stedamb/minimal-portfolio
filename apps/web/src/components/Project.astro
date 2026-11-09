@@ -59,38 +59,7 @@ const meta = [project.client, project.role, project.date].filter(Boolean).join('
 </div>
 
 <script>
-  const INLINE_CLASSES = ['lazyload', 'h-[200px]', 'lg:h-[400px]', 'cursor-hover', 'cursor-fullscreen'];
-  const FULLSCREEN_CLASSES = ['fixed', 'inset-0', 'w-screen', 'h-screen', 'bg-text', 'z-50', 'flex', 'items-center', 'justify-center'];
+  import { initGallery } from '../scripts/gallery';
 
-  let openItem: HTMLElement | null = null;
-
-  const setFullscreen = (item: HTMLElement, fullscreen: boolean) => {
-    item.classList.remove(...(fullscreen ? INLINE_CLASSES : FULLSCREEN_CLASSES));
-    item.classList.add(...(fullscreen ? FULLSCREEN_CLASSES : INLINE_CLASSES));
-    const video = item.querySelector('video');
-    if (video) video.controls = fullscreen;
-    // Photos are shown whole in fullscreen instead of cropped to the inline box.
-    const photo = item.querySelector('img');
-    if (photo) photo.style.objectFit = fullscreen ? 'contain' : '';
-    item.querySelector('[data-gallery-caption]')?.classList.toggle('hidden', !fullscreen);
-    item.querySelector('[data-gallery-close]')!.classList.toggle('hidden', !fullscreen);
-    openItem = fullscreen ? item : null;
-    document.dispatchEvent(new CustomEvent('scroll-lock', { detail: fullscreen }));
-  };
-
-  document.querySelectorAll<HTMLElement>('[data-gallery-item]').forEach((item) => {
-    item.addEventListener('click', (event) => {
-      if ((event.target as Element).closest('[data-gallery-close]')) {
-        setFullscreen(item, false);
-      } else if (openItem !== item) {
-        // While open, clicks belong to the native video controls.
-        if (openItem) setFullscreen(openItem, false);
-        setFullscreen(item, true);
-      }
-    });
-  });
-
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && openItem) setFullscreen(openItem, false);
-  });
+  initGallery();
 </script>
