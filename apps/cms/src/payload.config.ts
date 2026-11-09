@@ -11,6 +11,7 @@ import { Projects } from './collections/Projects'
 import { Users } from './collections/Users'
 import { Videos } from './collections/Videos'
 import { Profile } from './globals/Profile'
+import { clientUploadAccess, demoGuard } from './plugins/demo-guard'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -46,8 +47,10 @@ export default buildConfig({
       collections: { images: true, videos: true },
       token: process.env.BLOB_READ_WRITE_TOKEN,
       alwaysInsertFields: true,
-      clientUploads: true,
+      clientUploads: { access: clientUploadAccess },
     }),
+    // Last, so it also covers whatever earlier plugins add (forms, MCP keys, ...).
+    demoGuard(),
   ],
   secret: process.env.PAYLOAD_SECRET || '',
   sharp,

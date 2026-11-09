@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import type { Payload } from 'payload'
 
 import type { Image, Video } from '../payload-types'
+import { seedUsers } from './users'
 
 const mediaDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'media')
 
@@ -123,20 +124,8 @@ const PROFILE = {
 export async function seed(payload: Payload): Promise<void> {
   const log = payload.logger.info.bind(payload.logger)
 
-  // 1. Owner first: nothing else is created without one (KTD9).
-  const email = process.env.OWNER_EMAIL
-  const password = process.env.OWNER_PASSWORD
-  if (!email || !password) throw new Error('OWNER_EMAIL and OWNER_PASSWORD must be set to seed')
-  const owner = await payload.find({ collection: 'users', where: { email: { equals: email } }, limit: 1, overrideAccess: true })
-  if (owner.totalDocs === 0) {
-    await payload.create({
-      collection: 'users',
-      data: { email, password, role: 'owner' },
-      overrideAccess: true,
-      context: { assignRole: true },
-    })
-    log(`seed: created owner ${email}`)
-  }
+  // 1. Accounts, owner first (KTD9).
+  await seedUsers(payload)
 
   // 2. Media, looked up by stored file name so a second run reuses it. `as` renames
   // the file on upload (clips of different projects share base names).

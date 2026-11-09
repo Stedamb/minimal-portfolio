@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { readPublished } from '../access/published'
-import { isOwner } from '../access/roles'
+import { isOwner, isOwnerOrDemo } from '../access/roles'
 
 export const Projects: CollectionConfig = {
   slug: 'projects',
@@ -15,7 +15,7 @@ export const Projects: CollectionConfig = {
   access: {
     read: readPublished,
     create: isOwner,
-    update: isOwner,
+    update: isOwnerOrDemo,
     delete: isOwner,
     readVersions: ({ req: { user } }) => Boolean(user),
   },
@@ -62,6 +62,8 @@ export const Projects: CollectionConfig = {
         },
         {
           slug: 'video',
+          // Without this the block's GraphQL type (Video) collides with the videos collection's.
+          graphQL: { singularName: 'ProjectVideoBlock' },
           labels: { singular: 'Video', plural: 'Videos' },
           fields: [{ name: 'video', type: 'upload', relationTo: 'videos', required: true }],
         },

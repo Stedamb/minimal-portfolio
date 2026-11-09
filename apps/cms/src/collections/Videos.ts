@@ -2,7 +2,7 @@ import type { CollectionConfig } from 'payload'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { isOwner } from '../access/roles'
+import { isOwner, isOwnerOrDemo } from '../access/roles'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -12,7 +12,7 @@ export const Videos: CollectionConfig = {
   access: {
     read: () => true,
     create: isOwner,
-    update: isOwner,
+    update: isOwnerOrDemo,
     delete: isOwner,
   },
   upload: {

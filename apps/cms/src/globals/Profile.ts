@@ -1,7 +1,7 @@
 import type { GlobalConfig } from 'payload'
 
 import { readPublished } from '../access/published'
-import { isOwner } from '../access/roles'
+import { isOwnerOrDemo } from '../access/roles'
 
 export const Profile: GlobalConfig = {
   slug: 'profile',
@@ -12,7 +12,7 @@ export const Profile: GlobalConfig = {
   },
   access: {
     read: readPublished,
-    update: isOwner,
+    update: isOwnerOrDemo,
     readVersions: ({ req: { user } }) => Boolean(user),
   },
   fields: [
