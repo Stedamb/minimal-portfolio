@@ -4,6 +4,15 @@
   "type": "module",
   "version": "0.0.1",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./cache-tags": "./src/cache-tags.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "5.7.3",
+    "vitest": "4.1.12"
   }
 }

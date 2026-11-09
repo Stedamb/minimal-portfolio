@@ -3,12 +3,14 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { isOwner, isOwnerOrDemo } from '../access/roles'
+import { purgeMediaChange, purgeMediaDelete } from '../hooks/purge'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export const Videos: CollectionConfig = {
   slug: 'videos',
   admin: { useAsTitle: 'title', defaultColumns: ['title', 'filename', 'mimeType'], group: 'Media' },
+  hooks: { afterChange: [purgeMediaChange('videos')], afterDelete: [purgeMediaDelete('videos')] },
   access: {
     read: () => true,
     create: isOwner,

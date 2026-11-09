@@ -7,6 +7,8 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // The shared package ships TypeScript source.
+  transpilePackages: ['@repo/shared'],
   turbopack: { root: path.resolve(dirname, '../..') },
 }
 

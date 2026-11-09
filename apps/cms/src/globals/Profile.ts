@@ -2,10 +2,12 @@ import type { GlobalConfig } from 'payload'
 
 import { readPublished } from '../access/published'
 import { isOwnerOrDemo } from '../access/roles'
+import { purgeProfileChange } from '../hooks/purge'
 
 export const Profile: GlobalConfig = {
   slug: 'profile',
   lockDocuments: false,
+  hooks: { afterChange: [purgeProfileChange] },
   versions: {
     max: 50,
     drafts: { autosave: true, schedulePublish: true },

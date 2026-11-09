@@ -5,6 +5,7 @@ import ContentSection from '../components/sections/ContentSection.astro';
 import NavSection from '../components/sections/NavSection.astro';
 import { getProfile, getProjects } from '../lib/payload';
 import { t, type Locale } from '../lib/i18n';
+import { cachePage, mediaTagsOf, pageTags } from '../lib/cache';
 
 interface Props {
   locale: Locale;
@@ -12,6 +13,7 @@ interface Props {
 
 const { locale } = Astro.props;
 const [profile, projects] = await Promise.all([getProfile(locale), getProjects(locale, { featured: true })]);
+cachePage(Astro.cache, pageTags.home(locale), mediaTagsOf([profile.photo, profile.hero, ...projects.map((p) => p.cover)]));
 ---
 
 <PageLayout title={t(locale).titles.home} locale={locale} profile={profile} showLoader>

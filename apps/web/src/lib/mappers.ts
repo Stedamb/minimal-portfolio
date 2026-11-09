@@ -1,4 +1,5 @@
 import type { Image, Profile, Project, Video } from '@repo/shared';
+import { mediaTag } from '@repo/shared/cache-tags';
 
 // Converts Payload documents into the plain shapes the components take. Every
 // URL-valued field goes through safeUrl here, on the public and the preview render alike.
@@ -18,6 +19,8 @@ export interface PhotoItem {
   objectPosition: string;
   width?: number;
   height?: number;
+  /** Cache tags of the media documents behind this item. */
+  tags: string[];
 }
 
 export interface VideoItem {
@@ -25,11 +28,15 @@ export interface VideoItem {
   /** WebM first when present, then MP4: browsers use the first source they support. */
   sources: { src: string; type: string }[];
   poster?: string;
+  /** Cache tags of the media documents behind this item. */
+  tags: string[];
 }
 
 export type MediaItem = PhotoItem | VideoItem;
 
 export interface ProjectView {
+  /** Document id, the cache tag key (slugs can change). */
+  id: number | string;
   slug: string;
   title: string;
   client: string;
@@ -99,6 +106,7 @@ export function mapImage(image: Image, ctx: MapContext, caption?: string | null)
     objectPosition: `${image.focalX ?? 50}% ${image.focalY ?? 50}%`,
     width: image.width ?? undefined,
     height: image.height ?? undefined,
+    tags: [mediaTag('images', image.id)],
   };
 }
 
@@ -115,6 +123,7 @@ export function mapVideo(video: Video, ctx: MapContext): VideoItem | undefined {
       { src: mp4, type: video.mimeType || 'video/mp4' },
     ],
     poster: poster ? mapImage(poster, ctx)?.src : undefined,
+    tags: [mediaTag('videos', video.id), ...(webm ? [mediaTag('videos', webm.id)] : []), ...(poster ? [mediaTag('images', poster.id)] : [])],
   };
 }
 
@@ -128,6 +137,7 @@ export function mapProject(doc: Project, ctx: MapContext): ProjectView {
   });
   const href = safeUrl(doc.externalLink?.href);
   return {
+    id: doc.id,
     slug: doc.slug,
     title: doc.title,
     client: doc.client,

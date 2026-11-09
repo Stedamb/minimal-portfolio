@@ -3,6 +3,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { isOwner, isOwnerOrDemo } from '../access/roles'
+import { purgeMediaChange, purgeMediaDelete } from '../hooks/purge'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -12,6 +13,7 @@ export const IMAGE_WIDTHS = [640, 1280, 1920, 2560] as const
 export const Images: CollectionConfig = {
   slug: 'images',
   admin: { useAsTitle: 'alt', defaultColumns: ['filename', 'alt', 'credit'], group: 'Media' },
+  hooks: { afterChange: [purgeMediaChange('images')], afterDelete: [purgeMediaDelete('images')] },
   access: {
     read: () => true,
     create: isOwner,

@@ -2,12 +2,14 @@ import type { CollectionConfig } from 'payload'
 
 import { readPublished } from '../access/published'
 import { isOwner, isOwnerOrDemo } from '../access/roles'
+import { capturePublishedProject, purgeProjectChange, purgeProjectDelete } from '../hooks/purge'
 
 export const Projects: CollectionConfig = {
   slug: 'projects',
   admin: { useAsTitle: 'title', defaultColumns: ['title', 'client', 'order', '_status', 'updatedAt'] },
   defaultSort: 'order',
   lockDocuments: false,
+  hooks: { beforeChange: [capturePublishedProject], afterChange: [purgeProjectChange], afterDelete: [purgeProjectDelete] },
   versions: {
     maxPerDoc: 50,
     drafts: { autosave: true, schedulePublish: true },

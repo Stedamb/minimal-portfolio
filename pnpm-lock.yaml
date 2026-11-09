@@ -71,6 +71,12 @@ importers:
       '@payloadcms/ui':
         specifier: 'catalog:'
         version: 3.93.0(@types/react@19.2.14)(monaco-editor@0.57.0)(next@16.4.5(@types/node@24.19.2)(babel-plugin-macros@3.1.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.77.4))(payload@3.93.0(graphql@16.15.0)(supports-color@10.2.2)(typescript@5.7.3))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(supports-color@10.2.2)(typescript@5.7.3)
+      '@repo/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
+      '@vercel/functions':
+        specifier: 3.11.0
+        version: 3.11.0(ws@8.22.2)
       graphql:
         specifier: ^16.14.2
         version: 16.15.0
@@ -120,6 +126,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.3.3
         version: 4.3.5(vite@8.3.6(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.77.4)(tsx@4.23.15)(yaml@2.9.1))
+      '@vercel/functions':
+        specifier: 3.11.0
+        version: 3.11.0(ws@8.22.2)
       astro:
         specifier: 'catalog:'
         version: 7.4.2(@types/node@24.19.2)(@vercel/blob@2.3.1)(@vercel/functions@3.11.0(ws@8.22.2))(esbuild@0.28.2)(jiti@2.7.0)(sass@1.77.4)(tsx@4.23.15)(yaml@2.9.1)
@@ -137,7 +146,14 @@ importers:
         specifier: 4.1.12
         version: 4.1.12(@types/node@24.19.2)(happy-dom@20.14.6)(vite@8.3.6(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.77.4)(tsx@4.23.15)(yaml@2.9.1))
 
-  packages/shared: {}
+  packages/shared:
+    devDependencies:
+      typescript:
+        specifier: 5.7.3
+        version: 5.7.3
+      vitest:
+        specifier: 4.1.12
+        version: 4.1.12(@types/node@24.19.2)(happy-dom@20.14.6)(vite@8.3.6(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.77.4)(tsx@4.23.15)(yaml@2.9.1))
 
 packages:
 

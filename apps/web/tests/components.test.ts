@@ -17,7 +17,7 @@ const profile: ProfileView = {
   phone: '+39 000',
   phoneHref: 'tel:+39000',
   instagram: 'https://www.instagram.com/',
-  photo: { kind: 'photo', src: 'http://cms/p.jpg', srcset: '', alt: '', objectPosition: '50% 50%' },
+  photo: { kind: 'photo', src: 'http://cms/p.jpg', srcset: '', alt: '', objectPosition: '50% 50%', tags: [] },
 };
 
 const ITALIAN_ONLY = ['Scrivimi', 'Chiama', 'Telefono', 'Scopri di più', 'Chiudi', 'Contatti', 'Guarda tutti', 'Contattami', 'Ritratto di', 'Torna'];
@@ -64,11 +64,11 @@ describe('language switch in the navbar', () => {
 
 describe('gallery', () => {
   it('renders photos and videos in one ordered list with captions under photos', async () => {
-    const photo = (alt: string, caption?: string) => ({ kind: 'photo' as const, src: `http://cms/${alt}.jpg`, srcset: '', alt, caption, objectPosition: '50% 50%' });
-    const video = { kind: 'video' as const, sources: [{ src: 'http://cms/v.mp4', type: 'video/mp4' }] };
+    const photo = (alt: string, caption?: string) => ({ kind: 'photo' as const, src: `http://cms/${alt}.jpg`, srcset: '', alt, caption, objectPosition: '50% 50%', tags: [] });
+    const video = { kind: 'video' as const, sources: [{ src: 'http://cms/v.mp4', type: 'video/mp4' }], tags: [] };
     const items = [photo('first', 'Prima'), video, photo('third')];
     const project: ProjectView = {
-      slug: 'x', title: 'X', client: 'C', role: '', date: '', preview: '', description: 'D', featured: false, items, cover: items[0],
+      id: 1, slug: 'x', title: 'X', client: 'C', role: '', date: '', preview: '', description: 'D', featured: false, items, cover: items[0],
     };
     const html = await render(Project, { project, locale: 'en' });
     expect(html.indexOf('alt="first"')).toBeLessThan(html.indexOf('<video'));

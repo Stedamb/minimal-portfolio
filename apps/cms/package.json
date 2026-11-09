@@ -27,7 +27,9 @@
     "payload": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "sharp": "0.35.5"
+    "sharp": "0.35.5",
+    "@vercel/functions": "3.11.0",
+    "@repo/shared": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^24.12.3",

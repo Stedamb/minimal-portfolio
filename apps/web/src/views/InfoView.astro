@@ -3,6 +3,7 @@ import PageLayout from '../layouts/PageLayout.astro';
 import Contact from '../components/Contact.astro';
 import { getProfile } from '../lib/payload';
 import { t, type Locale } from '../lib/i18n';
+import { cachePage, mediaTagsOf, pageTags } from '../lib/cache';
 
 interface Props {
   locale: Locale;
@@ -10,6 +11,7 @@ interface Props {
 
 const { locale } = Astro.props;
 const profile = await getProfile(locale);
+cachePage(Astro.cache, pageTags.info(locale), mediaTagsOf([profile.photo, profile.hero]));
 ---
 
 <PageLayout title={t(locale).titles.info} locale={locale} profile={profile}>

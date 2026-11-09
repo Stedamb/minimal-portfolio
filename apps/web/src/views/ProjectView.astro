@@ -4,6 +4,7 @@ import ProjectDetail from '../components/Project.astro';
 import NotFound from '../components/NotFound.astro';
 import { t, type Locale } from '../lib/i18n';
 import type { ProjectView } from '../lib/mappers';
+import { cachePage, mediaTagsOf, pageTags } from '../lib/cache';
 
 interface Props {
   locale: Locale;
@@ -12,6 +13,8 @@ interface Props {
 }
 
 const { locale, project } = Astro.props;
+// A missing project (404) is not cached, so it shows up as soon as it is published.
+if (project) cachePage(Astro.cache, pageTags.project(project.id, locale), mediaTagsOf(project.items));
 ---
 
 {
