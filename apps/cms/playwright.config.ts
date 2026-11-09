@@ -20,6 +20,8 @@ if (rootEnv) process.loadEnvFile(rootEnv)
 export default defineConfig({
   testDir: './tests/e2e',
   testMatch: '**/*.e2e.ts',
+  // The README recording runs through playwright.record.config.ts (`pnpm record:demo`).
+  testIgnore: '**/record-demo.e2e.ts',
   globalSetup: './tests/e2e/global-setup.ts',
   // One stack, one database: tests run in order.
   workers: 1,

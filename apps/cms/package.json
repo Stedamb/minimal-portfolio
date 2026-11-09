@@ -14,6 +14,7 @@
     "migrate:create": "pnpm payload migrate:create",
     "test:int": "NODE_OPTIONS=\"--no-deprecation --import ../../scripts/load-env.mjs\" vitest run --config ./vitest.config.mts",
     "test:e2e": "playwright test",
+    "record:demo": "playwright test --config playwright.record.config.ts",
     "typecheck": "tsc --noEmit",
     "seed": "pnpm migrate && NODE_OPTIONS=\"--no-deprecation --import ../../scripts/load-env.mjs\" payload run src/seed/run.ts"
   },
