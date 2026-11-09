@@ -19,6 +19,6 @@ Clips from the Blender Foundation open movies (Big Buck Bunny, Sintel, Tears of 
 Elephants Dream), (c) Blender Foundation | studio.blender.org, Creative Commons
 Attribution 3.0. `videos/supernova/` is placeholder footage that came with the template.
 
-## Profile photo (`images/profile.jpg`)
+## Profile photo
 
-Placeholder image that came with the template; replace it with your own.
+The seed uses `photos/tower.jpg` (above) as a placeholder portrait; replace it with your own.

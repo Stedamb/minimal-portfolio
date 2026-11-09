@@ -213,7 +213,8 @@ export async function seed(payload: Payload): Promise<void> {
   // 4. Profile, only while it is still empty so an owner's edits survive a re-run.
   const profile = await payload.findGlobal({ slug: 'profile', draft: true, overrideAccess: true })
   if (!profile.name) {
-    const photo = await upload('images', 'images/profile.jpg', { alt: `Ritratto di ${PROFILE.name}` })
+    // Placeholder until the owner uploads a portrait: a CC0 photo from the sample set.
+    const photo = await upload('images', 'photos/tower.jpg', { alt: 'Torre di guardia sul lago (segnaposto)' }, 'profile.jpg')
     const hero = await payload.find({ collection: 'videos', where: { filename: { equals: 'supernova-1.mp4' } }, limit: 1, overrideAccess: true })
     await payload.updateGlobal({
       slug: 'profile',
