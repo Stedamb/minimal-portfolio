@@ -1,4 +1,20 @@
+import { existsSync, readFileSync } from 'node:fs'
+import { parseEnv } from 'node:util'
 import type { Payload } from 'payload'
+
+const SECRET_KEYS = ['OWNER_PASSWORD', 'DEMO_PASSWORD', 'PREVIEW_API_KEY', 'SUBMITTER_API_KEY'] as const
+
+// Refuses to seed a remote database with the publicly known example credentials,
+// which is what happens if the production values were not exported before seeding.
+export function assertNoExampleSecrets(env: Record<string, string | undefined> = process.env): void {
+  const host = env.DATABASE_URL ? new URL(env.DATABASE_URL).hostname : 'localhost'
+  if (['localhost', '127.0.0.1', '::1'].includes(host)) return
+  const exampleFile = new URL('../../../../.env.example', import.meta.url)
+  if (!existsSync(exampleFile)) return
+  const example = parseEnv(readFileSync(exampleFile, 'utf8'))
+  const reused = SECRET_KEYS.filter((key) => env[key] && env[key] === example[key])
+  if (reused.length) throw new Error(`Refusing to seed ${host}: ${reused.join(', ')} still use the .env.example values`)
+}
 
 type Role = 'owner' | 'demo' | 'preview' | 'submitter'
 
@@ -26,6 +42,8 @@ export async function seedUsers(payload: Payload): Promise<void> {
     })
     log(`seed: created ${role} ${data.email}`)
   }
+
+  assertNoExampleSecrets()
 
   const ownerEmail = process.env.OWNER_EMAIL
   const ownerPassword = process.env.OWNER_PASSWORD
