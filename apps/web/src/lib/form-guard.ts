@@ -1,7 +1,7 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
-import { getContactForm } from './payload';
+import { CMS_TIMEOUT_MS, getContactForm } from './payload';
 import { defaultLocale, isLocale, type Locale } from './i18n';
-import { env } from './env';
+import { cmsUrl, env } from './env';
 import type { ContactFieldView, MapContext } from './mappers';
 
 // Spam and abuse checks for the contact form. The browser never talks to Payload:
@@ -29,7 +29,7 @@ export interface ContactEnv extends MapContext {
 }
 
 export const contactEnv = (): ContactEnv => ({
-  cmsUrl: env('CMS_URL') ?? 'http://localhost:3000',
+  cmsUrl: cmsUrl(),
   secret: env('CONTACT_FORM_SECRET') ?? '',
   submitterKey: env('SUBMITTER_API_KEY') ?? '',
   bypass: env('VERCEL_AUTOMATION_BYPASS_SECRET') || undefined,
@@ -66,6 +66,7 @@ const invalidField = (field: ContactFieldView, value: string): boolean =>
 
 async function cms(path: string, env: ContactEnv, init: RequestInit = {}): Promise<Response> {
   return fetch(new URL(path, env.cmsUrl), {
+    signal: AbortSignal.timeout(CMS_TIMEOUT_MS),
     ...init,
     headers: {
       authorization: `users API-Key ${env.submitterKey}`,

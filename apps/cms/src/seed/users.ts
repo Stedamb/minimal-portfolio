@@ -2,6 +2,8 @@ import { existsSync, readFileSync } from 'node:fs'
 import { parseEnv } from 'node:util'
 import type { Payload } from 'payload'
 
+import type { Role } from '../access/roles'
+
 const SECRET_KEYS = ['PAYLOAD_SECRET', 'OWNER_PASSWORD', 'DEMO_PASSWORD', 'PREVIEW_API_KEY', 'SUBMITTER_API_KEY'] as const
 
 // Refuses to seed a remote database with the publicly known example credentials,
@@ -16,7 +18,6 @@ export function assertNoExampleSecrets(env: Record<string, string | undefined> =
   if (reused.length) throw new Error(`Refusing to seed ${host}: ${reused.join(', ')} still use the .env.example values`)
 }
 
-type Role = 'owner' | 'demo' | 'preview' | 'submitter'
 
 // Creates the accounts, owner first. Idempotent: an existing email is left alone.
 export async function seedUsers(payload: Payload): Promise<void> {

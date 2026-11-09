@@ -12,6 +12,9 @@ const DEPTH = '2';
 /** Matches the slug the CMS seed gives the contact form. */
 export const CONTACT_FORM_SLUG = 'contact';
 
+// A hung CMS must not hold a page render, a preview or a contact submission open.
+export const CMS_TIMEOUT_MS = 8000;
+
 const defaultContext = (): MapContext => ({
   cmsUrl: cmsUrl(),
 });
@@ -19,7 +22,7 @@ const defaultContext = (): MapContext => ({
 async function get<T>(path: string, params: Record<string, string>, { cmsUrl }: MapContext): Promise<T> {
   const url = new URL(path, cmsUrl);
   for (const [key, value] of Object.entries(params)) url.searchParams.set(key, value);
-  const response = await fetch(url);
+  const response = await fetch(url, { signal: AbortSignal.timeout(CMS_TIMEOUT_MS) });
   if (!response.ok) throw new Error(`CMS request failed: ${response.status} ${url.pathname}`);
   return (await response.json()) as T;
 }
@@ -71,6 +74,7 @@ async function previewRequest<T>(path: string, params: Record<string, string>, b
   const url = new URL(path, cmsUrl);
   for (const [name, value] of Object.entries(params)) url.searchParams.set(name, value);
   const response = await fetch(url, {
+    signal: AbortSignal.timeout(CMS_TIMEOUT_MS),
     // With a body, Payload merges it into the document (the find endpoint's `data` argument)
     // and populates relationships at the requested depth, exactly as for a saved draft.
     method: body ? 'POST' : 'GET',

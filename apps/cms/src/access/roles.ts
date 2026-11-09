@@ -10,7 +10,6 @@ export const hasRole = (user: WithRole, ...roles: Role[]): boolean =>
   Boolean((user as { role?: string | null } | null | undefined)?.role && (roles as string[]).includes((user as { role: string }).role))
 
 export const isOwner: Access = ({ req }) => hasRole(req.user, 'owner')
-export const isDemo: Access = ({ req }) => hasRole(req.user, 'demo')
 
 // The demo account keeps `update` on content so fields stay editable and live
 // preview works; the demo guard rejects what it actually tries to write.
