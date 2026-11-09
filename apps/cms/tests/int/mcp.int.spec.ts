@@ -14,8 +14,8 @@ const OWNER_KEY = 'mcp-test-owner-key'
 const DEMO_KEY = 'mcp-test-demo-key'
 const ALL_TOOLS = {
   projects: { find: true, create: true, update: true },
-  images: { find: true, create: true, update: true },
-  videos: { find: true, create: true, update: true },
+  images: { find: true, update: true },
+  videos: { find: true, update: true },
   profile: { find: true, update: true },
 }
 

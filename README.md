@@ -63,7 +63,7 @@ The preview pane is an iframe of a `web` route (`/preview/...`). Its URL carries
 
 ## Connect Claude Code over MCP
 
-The CMS serves MCP at `/api/mcp` (through `@payloadcms/plugin-mcp`). Clients can find, create and update projects, images, videos and the profile. Nothing can be deleted. Tools run with the key owner's access rules, and the tool descriptions ask the client to save drafts, so nothing goes live until the owner publishes it in the admin.
+The CMS serves MCP at `/api/mcp` (through `@payloadcms/plugin-mcp`). Clients can find, create and update projects and the profile, and edit the details of uploaded images and videos (new media is uploaded in the admin). Nothing can be deleted. Tools run with the key owner's access rules. The tool descriptions ask the client to save drafts (`draft: true`) so the owner reviews changes before publishing, but a client that leaves it out publishes directly: only tick the tools you trust the client with.
 
 API keys are created by the owner in the admin (the MCP API Keys collection, visible to the owner only). Each key has per-tool checkboxes, which are off by default: tick only what the client needs.
 
@@ -133,7 +133,7 @@ Deployment is two Vercel projects from this repo. The build settings are in `app
 3. **Media**: create a Blob store and connect it to `cms`. That sets `BLOB_READ_WRITE_TOKEN`.
 4. **Secrets**: set every variable in the table above, with long random values for the secrets. `CRON_SECRET` must be set on `cms`. `PREVIEW_SECRET`, `REVALIDATE_SECRET`, `PREVIEW_API_KEY` and `SUBMITTER_API_KEY` must have the same value in both projects.
 5. **Protection Bypass for Automation**: enable it in both projects and set `VERCEL_AUTOMATION_BYPASS_SECRET` to the same value in both, so server-to-server calls pass Vercel Authentication.
-6. **Rate-limit the login**: in the `cms` project's Vercel Firewall, add a rate-limit rule on `/api/users/login`, which the admin signs in through. The demo login is public, so this matters.
+6. **Rate-limit the login**: in the `cms` project's Vercel Firewall, add a rate-limit rule on `/api/users/login`, which the admin signs in through, and on `/api/graphql`, which also offers a login mutation. Account lockout is off (`maxLoginAttempts: 0`) so nobody can lock the public demo account, which makes this rule the only brute-force protection, owner account included.
 7. **Seed**: before sharing the CMS URL, run the seed once against the production database: `pnpm --filter cms seed`, with the production values of `DATABASE_URL`, `PAYLOAD_SECRET`, `OWNER_EMAIL`, `OWNER_PASSWORD`, `DEMO_EMAIL`, `DEMO_PASSWORD`, `PREVIEW_API_KEY` and `SUBMITTER_API_KEY` exported in your shell (shell values win over `.env`). It creates the owner first, and the other accounts only once an owner exists. Accounts that already exist are left alone. It also creates the sample projects, which you can unpublish or replace. Against a remote database the seed refuses to run while any password or API key still has its `.env.example` value, and on Vercel the scripts never fall back to `.env.example`.
 8. **Check**: the site renders, the admin loads, the demo login works and live preview shows the page. Check live preview on the production domains: on a protected preview deployment, the editor would also need to be signed in to Vercel.
 

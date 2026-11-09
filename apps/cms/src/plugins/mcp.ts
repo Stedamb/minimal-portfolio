@@ -25,11 +25,13 @@ export const mcp = () =>
           'the FIRST item is the project cover on the homepage and the portfolio. `order` sorts projects (lower first). Projects have drafts and versions.',
       },
       images: {
-        enabled: { find: true, create: true, update: true, delete: false },
+        // Uploads need a file, which MCP tools cannot carry: media is uploaded in the admin.
+        enabled: { find: true, create: false, update: true, delete: false },
         description: `An uploaded photo. Use find to look up ids for project items. ${CONTENT_HINT} The alt text is localized.`,
       },
       videos: {
-        enabled: { find: true, create: true, update: true, delete: false },
+        // Uploads need a file, which MCP tools cannot carry: media is uploaded in the admin.
+        enabled: { find: true, create: false, update: true, delete: false },
         description: `An uploaded video. Use find to look up ids for project items. ${CONTENT_HINT}`,
       },
     },

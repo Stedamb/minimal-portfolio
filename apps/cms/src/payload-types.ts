@@ -463,10 +463,6 @@ export interface PayloadMcpApiKey {
      */
     find?: boolean | null;
     /**
-     * Allow clients to create images.
-     */
-    create?: boolean | null;
-    /**
      * Allow clients to update images.
      */
     update?: boolean | null;
@@ -476,10 +472,6 @@ export interface PayloadMcpApiKey {
      * Allow clients to find videos.
      */
     find?: boolean | null;
-    /**
-     * Allow clients to create videos.
-     */
-    create?: boolean | null;
     /**
      * Allow clients to update videos.
      */
@@ -910,14 +902,12 @@ export interface PayloadMcpApiKeysSelect<T extends boolean = true> {
     | T
     | {
         find?: T;
-        create?: T;
         update?: T;
       };
   videos?:
     | T
     | {
         find?: T;
-        create?: T;
         update?: T;
       };
   profile?:
