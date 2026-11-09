@@ -4,7 +4,7 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "pnpm migrate && NODE_OPTIONS=\"--no-deprecation --import ../../scripts/load-env.mjs\" next dev --port 3000",
+    "dev": "pnpm migrate && NODE_OPTIONS=\"--no-deprecation --import ../../scripts/load-env.mjs\" next dev --port ${CMS_PORT:-3000}",
     "build": "pnpm migrate && NODE_OPTIONS=\"--no-deprecation --import ../../scripts/load-env.mjs\" next build",
     "start": "NODE_OPTIONS=\"--no-deprecation --import ../../scripts/load-env.mjs\" next start",
     "payload": "NODE_OPTIONS=\"--no-deprecation --import ../../scripts/load-env.mjs\" payload",
@@ -13,6 +13,7 @@
     "migrate": "pnpm payload migrate",
     "migrate:create": "pnpm payload migrate:create",
     "test:int": "NODE_OPTIONS=\"--no-deprecation --import ../../scripts/load-env.mjs\" vitest run --config ./vitest.config.mts",
+    "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
     "seed": "pnpm migrate && NODE_OPTIONS=\"--no-deprecation --import ../../scripts/load-env.mjs\" payload run src/seed/run.ts"
   },
@@ -24,16 +25,17 @@
     "@payloadcms/richtext-lexical": "catalog:",
     "@payloadcms/storage-vercel-blob": "catalog:",
     "@payloadcms/ui": "catalog:",
+    "@repo/shared": "workspace:*",
+    "@vercel/functions": "3.11.0",
     "graphql": "^16.14.2",
     "next": "catalog:",
     "payload": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "sharp": "0.35.5",
-    "@vercel/functions": "3.11.0",
-    "@repo/shared": "workspace:*"
+    "sharp": "0.35.5"
   },
   "devDependencies": {
+    "@playwright/test": "1.65.0",
     "@types/node": "^24.12.3",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
