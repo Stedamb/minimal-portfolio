@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { parseEnv } from 'node:util'
 import type { Payload } from 'payload'
 
-const SECRET_KEYS = ['OWNER_PASSWORD', 'DEMO_PASSWORD', 'PREVIEW_API_KEY', 'SUBMITTER_API_KEY'] as const
+const SECRET_KEYS = ['PAYLOAD_SECRET', 'OWNER_PASSWORD', 'DEMO_PASSWORD', 'PREVIEW_API_KEY', 'SUBMITTER_API_KEY'] as const
 
 // Refuses to seed a remote database with the publicly known example credentials,
 // which is what happens if the production values were not exported before seeding.

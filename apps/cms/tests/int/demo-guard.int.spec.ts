@@ -381,10 +381,10 @@ describe('locks (R18)', () => {
 })
 
 describe('preferences middleware (writes go straight to the database, KTD8)', () => {
-  const call = async (method: string, urlPath: string, body?: string) => {
+  const call = async (method: string, urlPath: string, body?: string, contentType = 'application/json') => {
     const { NextRequest } = await import('next/server')
     const { proxy } = await import('../../src/proxy')
-    const res = await proxy(new NextRequest(`http://localhost:3100${urlPath}`, { method, body, headers: body ? { 'Content-Type': 'application/json' } : {} }))
+    const res = await proxy(new NextRequest(`http://localhost:3100${urlPath}`, { method, body, headers: body ? { 'Content-Type': contentType } : {} }))
     return { status: res.status, passes: res.headers.get('x-middleware-next') === '1' }
   }
   const small = JSON.stringify({ value: { open: true } })
@@ -396,11 +396,17 @@ describe('preferences middleware (writes go straight to the database, KTD8)', ()
       'dashboard-layout',
       'browse-by-folder',
       'collection-projects',
-      'collection-projects-12',
       'global-profile',
       'projects-collection-folder',
     ]
     for (const key of keys) expect(await call('POST', `/api/payload-preferences/${key}`, small), key).toEqual({ status: 200, passes: true })
+  })
+
+  it('answers a per-document key without storing it', async () => {
+    const before = (await payload.count({ collection: 'payload-preferences', overrideAccess: true })).totalDocs
+    const res = await call('POST', '/api/payload-preferences/collection-projects-42', small)
+    expect(res).toEqual({ status: 200, passes: false })
+    expect((await payload.count({ collection: 'payload-preferences', overrideAccess: true })).totalDocs).toBe(before)
   })
 
   it('lets every collection and global of this config store its list and document preferences', async () => {
@@ -426,6 +432,19 @@ describe('preferences middleware (writes go straight to the database, KTD8)', ()
     const mutation = JSON.stringify({ query: 'mutation { createPayloadPreference(data: { key: "x" }) { id } }' })
     expect((await call('POST', '/api/graphql', mutation)).status).toBe(403)
     expect((await call('POST', '/api/graphql', JSON.stringify({ query: '{ Projects { totalDocs } }' }))).passes).toBe(true)
+  })
+
+  it('reads the GraphQL query the way graphql-http does, not the raw body', async () => {
+    const escaped = '{"query":"mutation { \\u0063reatePayloadPreference(data: { key: \\"x\\" }) { id } }"}'
+    expect(JSON.parse(escaped).query).toContain('createPayloadPreference')
+    expect((await call('POST', '/api/graphql', escaped)).status).toBe(403)
+    const batch = JSON.stringify([{ query: '{ Projects { totalDocs } }' }, { query: 'mutation { deletePayloadPreference(id: 1) { id } }' }])
+    expect((await call('POST', '/api/graphql', batch)).status).toBe(403)
+    expect((await call('POST', '/api/graphql', 'not json')).status).toBe(400)
+    expect((await call('POST', '/api/graphql', JSON.stringify({ query: 7 }))).status).toBe(400)
+    expect((await call('POST', '/api/graphql', 'mutation { createPayloadPreference(data: {}) { id } }', 'application/graphql')).status).toBe(403)
+    expect((await call('POST', '/api/graphql', '--x', 'multipart/form-data; boundary=x')).status).toBe(415)
+    expect((await call('POST', '/api/graphql', JSON.stringify([{ query: '{ Projects { totalDocs } }' }]))).passes).toBe(true)
   })
 
   it('leaves reads, deletes and every other route alone', async () => {

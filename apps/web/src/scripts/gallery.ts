@@ -1,4 +1,4 @@
-// Fullscreen gallery for project items. Idempotent: items bind once (marked in the DOM) and the
+// Fullscreen gallery for project items. Idempotent: items bind once (tracked in a WeakSet, since a morph strips DOM markers) and the
 // Escape listener binds once, so a live-preview swap can call it again for the new items.
 
 const INLINE_CLASSES = ['lazyload', 'h-[200px]', 'lg:h-[400px]', 'cursor-hover', 'cursor-fullscreen'];
@@ -6,6 +6,7 @@ const FULLSCREEN_CLASSES = ['fixed', 'inset-0', 'w-screen', 'h-screen', 'bg-text
 
 let openItem: HTMLElement | null = null;
 let keydownBound = false;
+const bound = new WeakSet<HTMLElement>();
 
 const setFullscreen = (item: HTMLElement, fullscreen: boolean) => {
   item.classList.remove(...(fullscreen ? INLINE_CLASSES : FULLSCREEN_CLASSES));
@@ -29,8 +30,8 @@ export function initGallery() {
   }
 
   document.querySelectorAll<HTMLElement>('[data-gallery-item]').forEach((item) => {
-    if (item.dataset.galleryBound) return;
-    item.dataset.galleryBound = 'true';
+    if (bound.has(item)) return;
+    bound.add(item);
     item.addEventListener('click', (event) => {
       if ((event.target as Element).closest('[data-gallery-close]')) {
         setFullscreen(item, false);

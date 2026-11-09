@@ -2,6 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { startLivePreview } from '../src/scripts/live-preview';
 import { initGallery } from '../src/scripts/gallery';
+import { initHeroVideo } from '../src/scripts/hero-video';
 
 const CMS = 'http://localhost:3000';
 const PAGE_URL = 'http://localhost:4321/preview/projects/7?token=abc';
@@ -130,5 +131,24 @@ describe('gallery initialiser', () => {
     item.click();
     expect(locks).toEqual([true]);
     expect(item.classList.contains('fixed')).toBe(true);
+  });
+});
+
+describe('hero video initialiser', () => {
+  it('toggles once per click even after a morph strips attributes and it runs again', () => {
+    document.body.innerHTML = `<video data-hero-video data-hero-bound="true"></video>`;
+    const video = document.querySelector<HTMLVideoElement>('video')!;
+    let paused = true;
+    Object.defineProperty(video, 'paused', { get: () => paused });
+    const play = vi.fn(() => ((paused = false), Promise.resolve()));
+    const pause = vi.fn(() => (paused = true));
+    video.play = play as never;
+    video.pause = pause as never;
+    initHeroVideo();
+    video.removeAttribute('data-hero-bound'); // what Idiomorph does to attributes absent from the new render
+    initHeroVideo();
+    video.click();
+    expect(play).toHaveBeenCalledTimes(1);
+    expect(pause).not.toHaveBeenCalled();
   });
 });

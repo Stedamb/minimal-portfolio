@@ -13,10 +13,17 @@ const slug = `(?:${PREFERENCE_SLUGS.join('|')})`
 
 // Keys written by @payloadcms/ui and @payloadcms/next 3.93: the nav state, the
 // locale, the dashboard and folder views, `collection-<slug>` (list columns, live
-// preview), `collection-<slug>-<id>` and `global-<slug>` (tabs, collapsibles).
+// preview) and `global-<slug>` (tabs, collapsibles). The per-document form
+// `collection-<slug>-<id>` is not allowed: ids are unbounded, so each would be a new row.
 const ALLOWED_KEY = new RegExp(
-  `^(?:nav|locale|dashboard-layout|browse-by-folder|collection-${slug}(?:-\\d{1,12})?|global-${slug}|${slug}-collection-folder)$`,
+  `^(?:nav|locale|dashboard-layout|browse-by-folder|collection-${slug}|global-${slug}|${slug}-collection-folder)$`,
 )
+
+// Per-document keys the admin writes (tabs, collapsibles of one document). Answered
+// without storing: the admin ignores the response.
+const PER_DOCUMENT_KEY = new RegExp(`^collection-${slug}-\\d{1,12}$`)
+
+export const isPerDocumentPreferenceKey = (key: string): boolean => PER_DOCUMENT_KEY.test(key)
 
 export const isAllowedPreferenceKey = (key: string): boolean => ALLOWED_KEY.test(key)
 
