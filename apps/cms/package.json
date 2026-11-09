@@ -13,7 +13,8 @@
     "migrate": "pnpm payload migrate",
     "migrate:create": "pnpm payload migrate:create",
     "test:int": "NODE_OPTIONS=\"--no-deprecation --import ../../scripts/load-env.mjs\" vitest run --config ./vitest.config.mts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "seed": "pnpm migrate && NODE_OPTIONS=\"--no-deprecation --import ../../scripts/load-env.mjs\" payload run src/seed/run.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "catalog:",

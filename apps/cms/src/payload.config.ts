@@ -6,7 +6,11 @@ import { fileURLToPath } from 'node:url'
 import { buildConfig } from 'payload'
 import sharp from 'sharp'
 
+import { Images } from './collections/Images'
+import { Projects } from './collections/Projects'
 import { Users } from './collections/Users'
+import { Videos } from './collections/Videos'
+import { Profile } from './globals/Profile'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -15,7 +19,8 @@ export default buildConfig({
     user: Users.slug,
     importMap: { baseDir: path.resolve(dirname) },
   },
-  collections: [Users],
+  collections: [Users, Projects, Images, Videos],
+  globals: [Profile],
   editor: lexicalEditor(),
   db: postgresAdapter({
     pool: {
@@ -35,11 +40,10 @@ export default buildConfig({
     fallback: true,
   },
   plugins: [
-    // Upload collections (images, videos) are listed here by U3. With no token
-    // the adapter disables itself and Payload stores files in `media/`.
+    // With no token the adapter disables itself and Payload stores files in `media/`.
     vercelBlobStorage({
       enabled: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
-      collections: {},
+      collections: { images: true, videos: true },
       token: process.env.BLOB_READ_WRITE_TOKEN,
       alwaysInsertFields: true,
       clientUploads: true,
