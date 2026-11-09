@@ -9,7 +9,7 @@ const port = Number(process.env.PGLITE_PORT ?? 5432)
 const dataDir = resolve(rootDir, process.env.PGLITE_DATA_DIR ?? '.pglite')
 
 const db = await PGlite.create(dataDir)
-const server = new PGLiteSocketServer({ db, port, host: 'localhost' })
+const server = new PGLiteSocketServer({ db, port, host: 'localhost', maxConnections: 10 })
 await server.start()
 console.log(`PGlite listening on postgres://postgres:postgres@localhost:${port}/postgres (data: ${dataDir})`)
 

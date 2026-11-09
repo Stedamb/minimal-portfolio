@@ -30,3 +30,7 @@ pnpm-debug.log*
 apps/cms/media/
 .next/
 
+
+# generated
+*.tsbuildinfo
+next-env.d.ts

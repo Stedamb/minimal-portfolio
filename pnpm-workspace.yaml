@@ -7,6 +7,11 @@ packages:
 catalog:
   astro: 7.4.2
   payload: 3.93.0
+  '@payloadcms/db-postgres': 3.93.0
+  '@payloadcms/next': 3.93.0
+  '@payloadcms/richtext-lexical': 3.93.0
+  '@payloadcms/storage-vercel-blob': 3.93.0
+  '@payloadcms/ui': 3.93.0
   next: ~16.4.5
   react: ~19.3.1
   react-dom: ~19.3.1
