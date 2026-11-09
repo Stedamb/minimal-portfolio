@@ -389,6 +389,15 @@ describe('preferences middleware (writes go straight to the database, KTD8)', ()
   }
   const small = JSON.stringify({ value: { open: true } })
 
+  it('checks the decoded path, so percent-encoding cannot skip the checks', async () => {
+    expect(await call('POST', '/api/payload%2Dpreferences/unknown-key', small)).toEqual({ status: 400, passes: false })
+    expect(await call('POST', '/api/payload%2Dpreferences', small)).toEqual({ status: 403, passes: false })
+    expect(await call('POST', '/api/payload-preferences/nav%2Fextra', small)).toEqual({ status: 403, passes: false })
+    expect(await call('POST', '/api/%67raphql', JSON.stringify({ query: 'mutation { createPayloadPreference(key: "x", value: {}) { id } }' }))).toEqual({ status: 403, passes: false })
+    expect((await call('POST', '/api/payload-preferences/%E0%A4%A', small)).status).toBe(400)
+    expect(await call('POST', '/api/payload%2Dpreferences/nav', small)).toEqual({ status: 200, passes: true })
+  })
+
   it('lets the keys the admin writes through', async () => {
     const keys = [
       'nav',

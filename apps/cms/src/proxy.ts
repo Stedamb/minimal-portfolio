@@ -43,18 +43,26 @@ async function guardGraphql(request: NextRequest) {
 }
 
 export async function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl
   const write = !['GET', 'HEAD', 'OPTIONS', 'DELETE'].includes(request.method)
   if (!write) return NextResponse.next()
 
-  if (pathname === '/api/graphql') return guardGraphql(request)
+  // Payload routes on the decoded path, so match the decoded path too: otherwise
+  // `/api/payload%2Dpreferences/...` would reach the collection without these checks.
+  let pathname: string
+  try {
+    pathname = decodeURIComponent(request.nextUrl.pathname)
+  } catch {
+    return refuse(400, 'Invalid path.')
+  }
 
-  const match = PREFERENCES.exec(pathname)
-  if (!match) return NextResponse.next()
+  if (/^\/api\/graphql\/?$/.test(pathname)) return guardGraphql(request)
+  if (!pathname.startsWith('/api/payload-preferences')) return NextResponse.next()
 
   // The admin only ever POSTs `/payload-preferences/:key`; the generic create and
-  // update routes of the collection would skip the key check.
-  const key = match[1] ? decodeURIComponent(match[1]) : undefined
+  // update routes of the collection would skip the key check. Anything else under the
+  // prefix (an encoded slash in the key, a deeper path) is refused rather than let through.
+  const match = PREFERENCES.exec(pathname)
+  const key = match?.[1]
   if (request.method !== 'POST' || !key) return refuse(403, 'Not allowed.')
   if (isPerDocumentPreferenceKey(key)) return NextResponse.json({ message: 'Preference not stored.' }, { status: 200 })
   if (!isAllowedPreferenceKey(key)) return refuse(400, 'Unknown preference key.')
@@ -66,4 +74,5 @@ export async function proxy(request: NextRequest) {
   return NextResponse.next()
 }
 
-export const config = { matcher: ['/api/payload-preferences/:path*', '/api/graphql'] }
+// Every API path: an encoded path would not match a narrower matcher.
+export const config = { matcher: ['/api/:path*'] }
