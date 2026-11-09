@@ -75,7 +75,7 @@ claude mcp add --transport http portfolio https://<cms-domain>/api/mcp --header 
 
 ## Local setup
 
-Requires Node.js 24.22.1 or newer and [pnpm](https://pnpm.io) (`corepack enable` picks up the pinned version).
+Requires Node.js 24 and [pnpm](https://pnpm.io) (`corepack enable` picks up the pinned version).
 
 ```sh
 pnpm install
