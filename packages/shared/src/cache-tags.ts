@@ -1,5 +1,5 @@
-// The cache-tag vocabulary shared by `web` (declares tags on pages) and `cms` (purges them,
-// KTD5/KTD6). Tags use document ids, not slugs, so a slug change still purges the old URL.
+// The cache-tag vocabulary shared by `web` (declares tags on pages) and `cms` (purges them).
+// Tags use document ids, not slugs, so a slug change still purges the old URL.
 // Tags never contain a comma: Vercel's `Vercel-Cache-Tag` header is comma-separated.
 
 type Id = number | string

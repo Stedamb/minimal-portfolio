@@ -13,7 +13,7 @@ export const isOwner: Access = ({ req }) => hasRole(req.user, 'owner')
 export const isDemo: Access = ({ req }) => hasRole(req.user, 'demo')
 
 // The demo account keeps `update` on content so fields stay editable and live
-// preview works; the demo guard rejects what it actually tries to write (KTD8).
+// preview works; the demo guard rejects what it actually tries to write.
 export const isOwnerOrDemo: Access = ({ req }) => hasRole(req.user, 'owner', 'demo')
 
 // Principals whose writes the demo guard always refuses.

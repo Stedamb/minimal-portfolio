@@ -30,7 +30,7 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URL,
     },
-    // Schema changes ship as committed migrations (KTD4), never dev push.
+    // Schema changes ship as committed migrations, never dev push.
     // The integration tests opt in to push inside their own schema.
     push: process.env.DATABASE_PUSH === 'true',
     schemaName: process.env.DATABASE_SCHEMA || undefined,

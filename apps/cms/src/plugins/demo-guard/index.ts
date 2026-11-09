@@ -4,7 +4,7 @@ import type { Access, ClientUser, CollectionConfig, Config, GlobalConfig, Payloa
 import { hasRole, isReadOnlyRole } from '../../access/roles'
 import { rejectDemoScheduledJob, rejectDemoWrites } from './hooks'
 
-// The demo guard (KTD8). One plugin, applied last, that walks every collection and
+// The demo guard. One plugin, applied last, that walks every collection and
 // global present at config time:
 //  1. enforcement: `demo` and `preview` principals are rejected in `beforeOperation`
 //     for every write, whatever the access functions say (the demo keeps `update` so

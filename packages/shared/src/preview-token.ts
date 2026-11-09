@@ -1,4 +1,4 @@
-// Preview tokens (KTD7). The CMS signs one when it builds a live-preview URL, and `web`
+// Preview tokens. The CMS signs one when it builds a live-preview URL, and `web`
 // verifies it before it ever uses the preview API key. Web Crypto only, so the same file runs
 // in Next (cms) and in Astro on Vercel (web). The token is `base64url(payload).base64url(hmac)`
 // where the payload names the target (`projects/<id>` or `globals/<slug>`), the locale and an

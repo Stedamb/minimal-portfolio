@@ -7,8 +7,8 @@ import {
 } from './plugins/demo-guard/preferences'
 
 // Preference writes bypass collection hooks (Payload upserts them straight into the
-// database), so the demo guard can't cover them. Cap their size and key space here
-// (KTD8). Next 16 renamed `middleware` to `proxy`; this is the plan's "cms middleware".
+// database), so the demo guard can't cover them. Cap their size and key space here.
+// Next 16 renamed `middleware` to `proxy`.
 const PREFERENCES = /^\/api\/payload-preferences(?:\/([^/]+))?\/?$/
 
 const refuse = (status: number, message: string) => NextResponse.json({ errors: [{ message }] }, { status })

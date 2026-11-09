@@ -1,4 +1,4 @@
-// Live-preview route (KTD7, U7). A local HTTP server stands in for the CMS, so the tests
+// Live-preview route. A local HTTP server stands in for the CMS, so the tests
 // assert at the network boundary what reaches Payload and with which credentials.
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { createServer, type Server } from 'node:http';

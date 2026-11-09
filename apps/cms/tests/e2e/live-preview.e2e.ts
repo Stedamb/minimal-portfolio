@@ -2,7 +2,6 @@ import { expect, test } from '@playwright/test'
 
 import { login, openProject, webUrl } from './helpers'
 
-// Covers F3 / AE2.
 test('demo sees unsaved edits in the live preview; the public page keeps the old title', async ({ page, context }) => {
   await login(page, 'demo')
   await openProject(page, 'Big Buck Bunny')

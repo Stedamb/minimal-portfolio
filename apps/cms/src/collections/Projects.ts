@@ -28,7 +28,7 @@ export const Projects: CollectionConfig = {
   },
   fields: [
     { name: 'title', type: 'text', required: true, localized: true },
-    // One slug across languages keeps ids, cache tags and the language switch simple (KTD13).
+    // One slug across languages keeps ids, cache tags and the language switch simple.
     { name: 'slug', type: 'text', required: true, unique: true, index: true },
     { name: 'client', type: 'text', required: true },
     { name: 'role', type: 'text', localized: true },
@@ -53,7 +53,7 @@ export const Projects: CollectionConfig = {
       admin: { position: 'sidebar', description: 'Lower numbers come first on the site.' },
     },
     {
-      // The first item is the cover on the homepage and the portfolio (R5).
+      // The first item is the cover on the homepage and the portfolio.
       name: 'items',
       type: 'blocks',
       required: true,

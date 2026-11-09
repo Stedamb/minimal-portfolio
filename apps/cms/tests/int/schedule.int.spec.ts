@@ -1,4 +1,4 @@
-// Contract of scheduled publishing (R14, AE4, KTD14, U8): a scheduled publish runs
+// Contract of scheduled publishing: a scheduled publish runs
 // unattended through the jobs run endpoint, fires the same purge as a manual publish,
 // and only the owner or the cron secret can start a run. The REST handler is the one
 // Next mounts at /api/[...slug]; WEB_URL points at a local server that records purges.

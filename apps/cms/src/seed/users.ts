@@ -18,7 +18,7 @@ export function assertNoExampleSecrets(env: Record<string, string | undefined> =
 
 type Role = 'owner' | 'demo' | 'preview' | 'submitter'
 
-// Creates the accounts, owner first (KTD9). Idempotent: an existing email is left alone.
+// Creates the accounts, owner first. Idempotent: an existing email is left alone.
 export async function seedUsers(payload: Payload): Promise<void> {
   const log = payload.logger.info.bind(payload.logger)
 

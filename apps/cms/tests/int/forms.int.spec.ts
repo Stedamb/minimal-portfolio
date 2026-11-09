@@ -1,4 +1,4 @@
-// Contact form storage contract (KTD9, KTD11, R15, R16, R19, F6): only the site's `submitter`
+// Contact form storage contract: only the site's `submitter`
 // key can create submissions, only the owner reads them, and the submitter's one extra
 // capability (counting by IP hash) reveals a number and nothing else. REST goes through the
 // real Payload route handlers.

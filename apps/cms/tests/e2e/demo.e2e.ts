@@ -9,7 +9,6 @@ test.describe('demo account', () => {
     await login(page, 'demo')
   })
 
-  // Covers AE1.
   test('Save shows the demo notice, autosave stays silent and nothing is saved', async ({ page }) => {
     await openProject(page, 'Supernova')
     await page.locator('#field-title').fill('Supernova edited by demo')

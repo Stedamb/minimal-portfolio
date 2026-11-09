@@ -1,7 +1,7 @@
 import { signPreviewToken } from '@repo/shared/preview-token'
 import type { LivePreviewConfig } from 'payload'
 
-// Live preview (KTD7). The admin shows the `web` preview route in an iframe. The URL carries
+// Live preview. The admin shows the `web` preview route in an iframe. The URL carries
 // an HMAC token for exactly this document (or global) and locale, so `web` never needs the
 // admin's cookies. Kept cheap on purpose: Payload calls it on every autosave.
 

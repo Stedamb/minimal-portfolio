@@ -12,11 +12,10 @@ interface Props {
 }
 
 const { locale, result } = Astro.props;
-const profile = await getProfile(locale);
 // Not route-cached: the form carries a signed render timestamp, which must be fresh. Without
 // a configured secret the form can't be checked, so the e-mail card stays.
 const { secret } = contactEnv();
-const form = secret ? await getContactForm(locale).catch(() => null) : null;
+const [profile, form] = await Promise.all([getProfile(locale), secret ? getContactForm(locale).catch(() => null) : null]);
 const token = form ? signRenderToken(secret) : '';
 ---
 

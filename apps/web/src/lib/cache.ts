@@ -2,7 +2,7 @@ import { FEATURED_TAG, LAYOUT_TAG, PORTFOLIO_TAG, localeTag, projectTag } from '
 import type { Locale } from './i18n';
 import type { MediaItem } from './mappers';
 
-// Public pages are cached on Vercel's CDN with entity tags (KTD5). Publishing in the CMS
+// Public pages are cached on Vercel's CDN with entity tags. Publishing in the CMS
 // deletes the affected tags (see pages/api/revalidate.ts), so maxAge is only the safety net
 // for a lost purge call. In dev Astro's cache is a no-op, so nothing here needs a guard.
 

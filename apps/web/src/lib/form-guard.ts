@@ -1,9 +1,10 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { getContactForm } from './payload';
-import { locales, type Locale } from './i18n';
+import { defaultLocale, isLocale, type Locale } from './i18n';
+import { env } from './env';
 import type { ContactFieldView, MapContext } from './mappers';
 
-// Spam and abuse checks for the contact form (KTD11, R16). The browser never talks to Payload:
+// Spam and abuse checks for the contact form. The browser never talks to Payload:
 // the Astro Action calls handleContact, which validates, checks the honeypot, the signed render
 // timestamp and the per-IP rate limit, then creates the submission with the `submitter` key.
 
@@ -27,13 +28,11 @@ export interface ContactEnv extends MapContext {
   now?: () => number;
 }
 
-const read = (name: string): string | undefined => process.env[name] ?? (import.meta.env as Record<string, string | undefined>)[name];
-
 export const contactEnv = (): ContactEnv => ({
-  cmsUrl: read('CMS_URL') ?? 'http://localhost:3000',
-  secret: read('CONTACT_FORM_SECRET') ?? '',
-  submitterKey: read('SUBMITTER_API_KEY') ?? '',
-  bypass: read('VERCEL_AUTOMATION_BYPASS_SECRET') || undefined,
+  cmsUrl: env('CMS_URL') ?? 'http://localhost:3000',
+  secret: env('CONTACT_FORM_SECRET') ?? '',
+  submitterKey: env('SUBMITTER_API_KEY') ?? '',
+  bypass: env('VERCEL_AUTOMATION_BYPASS_SECRET') || undefined,
 });
 
 // One secret, two purposes: the label keeps a timestamp signature from doubling as an IP hash.
@@ -89,7 +88,7 @@ export async function handleContact(
   if (String(formData.get(HONEYPOT_FIELD) ?? '').trim()) return { status: 'sent' };
 
   const requested = String(formData.get(LOCALE_FIELD) ?? '');
-  const locale: Locale = (locales as readonly string[]).includes(requested) ? (requested as Locale) : 'it';
+  const locale: Locale = isLocale(requested) ? requested : defaultLocale;
   const text = (name: string) => String(formData.get(name) ?? '').trim();
 
   let form;

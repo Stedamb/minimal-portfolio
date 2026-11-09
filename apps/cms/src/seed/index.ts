@@ -125,7 +125,7 @@ const PROFILE = {
 export async function seed(payload: Payload): Promise<void> {
   const log = payload.logger.info.bind(payload.logger)
 
-  // 1. Accounts, owner first (KTD9).
+  // 1. Accounts, owner first.
   await seedUsers(payload)
 
   // 2. Media, looked up by stored file name so a second run reuses it. `as` renames

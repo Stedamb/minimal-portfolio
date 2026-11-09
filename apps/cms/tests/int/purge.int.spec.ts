@@ -1,4 +1,4 @@
-// Contract of the cache purge hooks (KTD6, U6): publishing purges exactly the affected tags
+// Contract of the cache purge hooks: publishing purges exactly the affected tags
 // by POSTing them to web's /api/revalidate; draft saves never do; a lost purge never fails
 // the owner's save. WEB_URL points at a local HTTP server that records what it receives.
 import { createServer, type Server } from 'node:http'

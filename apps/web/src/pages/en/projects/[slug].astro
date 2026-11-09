@@ -1,9 +1,9 @@
 ---
 import ProjectView from '../../../views/ProjectView.astro';
-import { getProject } from '../../../lib/payload';
+import { getProfile, getProject } from '../../../lib/payload';
 
-const project = await getProject(Astro.params.slug!, 'en');
+const [project, profile] = await Promise.all([getProject(Astro.params.slug!, 'en'), getProfile('en')]);
 if (!project) Astro.response.status = 404;
 ---
 
-<ProjectView locale="en" project={project} />
+<ProjectView locale="en" project={project} profile={profile} />

@@ -1,4 +1,4 @@
-// Contact form guard (KTD11, R15, R16, U9). The guard talks to a stub CMS over real HTTP, so
+// Contact form guard. The guard talks to a stub CMS over real HTTP, so
 // the rate limit is verified the way production holds it: state lives in the "CMS", never in
 // the web process.
 import { createServer, type Server } from 'node:http';

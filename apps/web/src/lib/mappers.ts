@@ -178,7 +178,7 @@ export function mapProfile(doc: Profile, ctx: MapContext): ProfileView {
   };
 }
 
-// --- Contact form (KTD11) ---------------------------------------------------------------
+// --- Contact form ---------------------------------------------------------------
 
 export interface ContactFieldView {
   name: string;

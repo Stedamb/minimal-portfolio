@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 import { webUrl } from './helpers'
 
-// Covers F5. The stack was started by the root command (global setup) on an empty database
+// The stack was started by the root command (global setup) on an empty database
 // directory and the env example, so a rendered homepage proves migrate + seed + both apps worked.
 test('the seeded homepage renders after the one-command setup', async ({ page }) => {
   const response = await page.goto(webUrl() + '/')

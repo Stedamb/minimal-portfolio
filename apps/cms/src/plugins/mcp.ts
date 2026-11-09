@@ -3,7 +3,7 @@ import { UnauthorizedError } from 'payload'
 
 import { hasRole, isOwner } from '../access/roles'
 
-// MCP endpoint at POST /api/mcp (KTD12, R21, R22). Owner-only: key management is limited to
+// MCP endpoint at POST /api/mcp. Owner-only: key management is limited to
 // the owner, and a key is refused unless the user it belongs to is the owner. Tools run the
 // Local API with overrideAccess: false, so the access rules and the demo guard apply too.
 // Delete is not enabled for anything. Each key also carries per-tool checkboxes (all off by

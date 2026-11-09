@@ -11,7 +11,7 @@ import type {
 
 import type { Project } from '../payload-types'
 
-// Cache purge hooks (KTD6, U6). Only transitions that change public content purge: a project
+// Cache purge hooks. Only transitions that change public content purge: a project
 // published, republished, unpublished or deleted; media changed or deleted; the profile
 // published. Draft saves and autosaves never do. The call goes to web's /api/revalidate after
 // the save has returned, and a failed call is logged, never thrown into the editor's save.

@@ -8,12 +8,12 @@ const webPort = Number(new URL(process.env.WEB_URL ?? 'http://localhost:4321').p
 
 // https://astro.build/config
 export default defineConfig({
-  // Every page is rendered on demand from Payload content (KTD5).
+  // Every page is rendered on demand from Payload content.
   output: 'server',
   adapter: vercel(),
-  // Route cache on Vercel's CDN, tagged per entity and purged on publish (KTD5, KTD6).
+  // Route cache on Vercel's CDN, tagged per entity and purged on publish.
   cache: { provider: cacheVercel() },
-  // Italian at the root, English under /en (KTD13).
+  // Italian at the root, English under /en.
   i18n: {
     defaultLocale: 'it',
     locales: ['it', 'en'],

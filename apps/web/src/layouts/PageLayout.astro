@@ -9,6 +9,7 @@ import PreviewBridge from '../components/PreviewBridge.astro';
 import { getProfile } from '../lib/payload';
 import type { ProfileView } from '../lib/mappers';
 import type { Locale } from '../lib/i18n';
+import { cmsUrl } from '../lib/env';
 
 import '../styles/index.css';
 
@@ -24,7 +25,6 @@ interface Props {
 }
 
 const { title, locale, showLoader = false, preview = false } = Astro.props;
-const cmsUrl = process.env.CMS_URL ?? import.meta.env.CMS_URL ?? 'http://localhost:3000';
 const profile = Astro.props.profile ?? (await getProfile(locale));
 const description = Astro.props.description || [profile.name, profile.role].filter(Boolean).join(', ');
 ---
@@ -51,6 +51,6 @@ const description = Astro.props.description || [profile.name, profile.role].filt
     </header>
     <slot />
     <footer><Footer name={profile.name} locale={locale} /></footer>
-    {preview && <PreviewBridge cmsUrl={cmsUrl} />}
+    {preview && <PreviewBridge cmsUrl={cmsUrl()} />}
   </body>
 </html>

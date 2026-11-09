@@ -1,7 +1,7 @@
 import { isLivePreviewEvent, ready } from '@payloadcms/live-preview';
 import { Idiomorph } from 'idiomorph';
 
-// Client side of live preview (KTD7). The admin posts its unsaved form state to this frame;
+// Client side of live preview. The admin posts its unsaved form state to this frame;
 // the frame debounces it, posts it to its own URL (the preview route merges it through
 // Payload and renders the page), then morphs the returned HTML into the page.
 

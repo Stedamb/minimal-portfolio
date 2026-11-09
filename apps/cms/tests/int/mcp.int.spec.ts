@@ -1,4 +1,4 @@
-// Contract of the MCP endpoint (KTD12, R21, R22, AE6, U10): owner-only. The requests go
+// Contract of the MCP endpoint: owner-only. The requests go
 // through the real /api/mcp handler as JSON-RPC over Streamable HTTP.
 import { createServer, type Server } from 'node:http'
 import type { AddressInfo } from 'node:net'

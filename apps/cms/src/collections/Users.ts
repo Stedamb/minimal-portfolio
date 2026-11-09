@@ -26,7 +26,7 @@ export const Users: CollectionConfig = {
       name: 'role',
       type: 'select',
       options: [...ROLES],
-      // No default: a self-registered first user gets no role (KTD9).
+      // No default: a self-registered first user gets no role.
       access: {
         create: ({ req }) => hasRole(req.user, 'owner'),
         update: ({ req }) => hasRole(req.user, 'owner'),

@@ -21,7 +21,7 @@ export const Images: CollectionConfig = {
     delete: isOwner,
   },
   upload: {
-    // Used with local storage only; the Blob adapter replaces it in production (KTD10).
+    // Used with local storage only; the Blob adapter replaces it in production.
     staticDir: path.resolve(dirname, '../../media/images'),
     mimeTypes: ['image/*'],
     focalPoint: true,

@@ -1,4 +1,4 @@
-// Contract of the demo guard (KTD8, U4): the demo account can open, read and type
+// Contract of the demo guard: the demo account can open, read and type
 // everywhere it may, and no write it attempts, through any path, reaches the
 // database or storage. REST goes through the real Payload route handlers.
 import { existsSync, readdirSync } from 'node:fs'

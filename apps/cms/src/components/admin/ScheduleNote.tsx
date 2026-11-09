@@ -2,7 +2,7 @@
 
 import { useTranslation } from '@payloadcms/ui'
 
-// Scheduled publishes are picked up by a Vercel Schedule every 15 minutes (KTD14, R14),
+// Scheduled publishes are picked up by a Vercel Schedule every 15 minutes,
 // so the chosen time is a lower bound, not an exact moment.
 const TEXT = {
   en: 'Scheduled publishes go live within about 30 minutes of the chosen time.',

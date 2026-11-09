@@ -1,4 +1,4 @@
-// The live-preview URL (KTD7, U7): the CMS signs a token for the document (or global) and
+// The live-preview URL: the CMS signs a token for the document (or global) and
 // locale that `web` verifies, and the token lives exactly as long as an admin session.
 import { verifyPreviewToken } from '@repo/shared/preview-token'
 import { getPayload, type Payload } from 'payload'

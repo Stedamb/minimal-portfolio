@@ -1,5 +1,6 @@
 import type { Form, Profile, Project } from '@repo/shared';
 import type { Locale } from './i18n';
+import { bypassHeader, cmsUrl, env } from './env';
 import { mapContactForm, mapProfile, mapProject, type ContactFormView, type MapContext, type ProfileView, type ProjectView } from './mappers';
 
 // Thin read-only client for the public Payload REST API. Anonymous requests only see
@@ -12,7 +13,7 @@ const DEPTH = '2';
 export const CONTACT_FORM_SLUG = 'contact';
 
 const defaultContext = (): MapContext => ({
-  cmsUrl: process.env.CMS_URL ?? import.meta.env.CMS_URL ?? 'http://localhost:3000',
+  cmsUrl: cmsUrl(),
 });
 
 async function get<T>(path: string, params: Record<string, string>, { cmsUrl }: MapContext): Promise<T> {
@@ -59,26 +60,23 @@ export async function getContactForm(locale: Locale, ctx: MapContext = defaultCo
   return docs[0] ? mapContactForm(docs[0]) : null;
 }
 
-// --- Live preview (KTD7) ---------------------------------------------------------------
+// --- Live preview ---------------------------------------------------------------
 // Drafts are read server-to-server with the read-only `preview` API-key user. The route
 // verifies the preview token before calling any of this, so the key never serves anonymous
 // requests directly.
 
-const envVar = (name: string): string | undefined => process.env[name] ?? (import.meta.env as Record<string, string | undefined>)[name];
-
 async function previewRequest<T>(path: string, params: Record<string, string>, body: unknown, { cmsUrl }: MapContext): Promise<T | null> {
-  const key = envVar('PREVIEW_API_KEY');
+  const key = env('PREVIEW_API_KEY');
   if (!key) throw new Error('PREVIEW_API_KEY is not set');
   const url = new URL(path, cmsUrl);
   for (const [name, value] of Object.entries(params)) url.searchParams.set(name, value);
-  const bypass = envVar('VERCEL_AUTOMATION_BYPASS_SECRET');
   const response = await fetch(url, {
     // With a body, Payload merges it into the document (the find endpoint's `data` argument)
     // and populates relationships at the requested depth, exactly as for a saved draft.
     method: body ? 'POST' : 'GET',
     headers: {
       authorization: `users API-Key ${key}`,
-      ...(bypass ? { 'x-vercel-protection-bypass': bypass } : {}),
+      ...bypassHeader(),
       ...(body ? { 'content-type': 'application/json', 'x-payload-http-method-override': 'GET' } : {}),
     },
     body: body ? JSON.stringify(body) : undefined,

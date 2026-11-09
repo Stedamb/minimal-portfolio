@@ -3,8 +3,8 @@ import type { Access, Endpoint } from 'payload'
 
 import { hasRole, isOwner, isOwnerOrDemo } from '../access/roles'
 
-// The CMS-defined contact form (KTD11, R15). Visitors never talk to Payload: the site's
-// Astro Action does, with the `submitter` API key (KTD9), after its own spam checks.
+// The CMS-defined contact form. Visitors never talk to Payload: the site's
+// Astro Action does, with the `submitter` API key, after its own spam checks.
 
 // Only the field kinds the site renders, so the owner can't add one the page would drop.
 const FIELDS = {

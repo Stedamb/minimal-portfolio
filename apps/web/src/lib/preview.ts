@@ -1,6 +1,4 @@
-import { locales, type Locale } from './i18n';
-
-// Helpers of the live-preview route (KTD7).
+// Helpers of the live-preview route.
 
 export type PreviewTarget = { kind: 'project'; id: string; path: string } | { kind: 'profile'; path: string };
 
@@ -15,8 +13,6 @@ export function parsePreviewTarget(param: string | undefined): PreviewTarget | n
   if (path === 'globals/profile') return { kind: 'profile', path };
   return null;
 }
-
-export const isLocale = (value: string): value is Locale => (locales as readonly string[]).includes(value);
 
 /**
  * Never cached, never indexed, and framable by the CMS admin only (the admin shows the page

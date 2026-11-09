@@ -20,7 +20,7 @@ export function PublishButton(props: Parameters<typeof DefaultPublishButton>[0])
       <Button buttonStyle="primary" size="medium" type="button" onClick={() => showDemoNotice(text.notice)}>
         {props?.label || t('version:publishChanges')}
       </Button>
-      {/* Visible so reviewers can see scheduling exists (R17), but it does nothing. */}
+      {/* Visible so reviewers can see scheduling exists, but it does nothing. */}
       <span title={text.scheduleDisabled}>
         <Button buttonStyle="secondary" size="medium" type="button" disabled>
           {text.schedule}

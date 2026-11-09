@@ -1,6 +1,7 @@
 export const locales = ['it', 'en'] as const;
 export type Locale = (typeof locales)[number];
 export const defaultLocale: Locale = 'it';
+export const isLocale = (value: string): value is Locale => (locales as readonly string[]).includes(value);
 
 export interface Strings {
   nav: { work: string; info: string; switchLanguage: string };

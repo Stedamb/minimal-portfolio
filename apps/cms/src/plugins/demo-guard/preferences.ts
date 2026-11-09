@@ -1,5 +1,5 @@
 // What the admin writes to `payload-preferences`. Those writes go straight to the
-// database (no hooks), so the proxy is the only place that can bound them (KTD8).
+// database (no hooks), so the proxy is the only place that can bound them.
 // No imports: the proxy must stay light.
 
 export const MAX_PREFERENCE_BODY_BYTES = 16 * 1024

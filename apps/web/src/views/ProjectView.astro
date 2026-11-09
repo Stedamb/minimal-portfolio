@@ -3,31 +3,33 @@ import PageLayout from '../layouts/PageLayout.astro';
 import ProjectDetail from '../components/Project.astro';
 import NotFound from '../components/NotFound.astro';
 import { t, type Locale } from '../lib/i18n';
-import type { ProjectView } from '../lib/mappers';
+import type { ProfileView, ProjectView } from '../lib/mappers';
 import { cachePage, mediaTagsOf, pageTags } from '../lib/cache';
 
 interface Props {
   locale: Locale;
   /** Null renders the 404 page; the route sets the status. */
   project: ProjectView | null;
+  /** Pass the profile when the route already loaded it, to avoid a second request. */
+  profile?: ProfileView;
   /** Live preview: render without declaring cache tags. */
   preview?: boolean;
 }
 
-const { locale, project, preview = false } = Astro.props;
+const { locale, project, profile, preview = false } = Astro.props;
 // A missing project (404) is not cached, so it shows up as soon as it is published.
 if (project && !preview) cachePage(Astro.cache, pageTags.project(project.id, locale), mediaTagsOf(project.items));
 ---
 
 {
   project ? (
-    <PageLayout title={project.title} description={project.preview} locale={locale} preview={preview}>
+    <PageLayout title={project.title} description={project.preview} locale={locale} profile={profile} preview={preview}>
       <main>
         <ProjectDetail project={project} locale={locale} />
       </main>
     </PageLayout>
   ) : (
-    <PageLayout title={t(locale).titles.notFound} locale={locale}>
+    <PageLayout title={t(locale).titles.notFound} locale={locale} profile={profile}>
       <main>
         <NotFound locale={locale} />
       </main>

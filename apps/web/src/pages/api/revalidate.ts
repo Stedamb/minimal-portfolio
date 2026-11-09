@@ -2,7 +2,7 @@ import { timingSafeEqual } from 'node:crypto';
 import { dangerouslyDeleteByTag } from '@vercel/functions';
 import type { APIRoute } from 'astro';
 
-// Called by the CMS purge hooks after a publish (KTD6). Deletes by tag rather than marking
+// Called by the CMS purge hooks after a publish. Deletes by tag rather than marking
 // stale (the Astro provider's `invalidate` only marks stale), so the first request after a
 // publish already renders the new page. Off Vercel the purge is a no-op and only logs.
 

@@ -25,7 +25,7 @@ export const Videos: CollectionConfig = {
     { name: 'title', type: 'text', required: true },
     { name: 'poster', type: 'upload', relationTo: 'images' },
     {
-      // The site serves this WebM before the MP4 when it is set (R7). It is
+      // The site serves this WebM before the MP4 when it is set. It is
       // another document of this collection, so no second upload field is needed.
       name: 'webm',
       type: 'relationship',

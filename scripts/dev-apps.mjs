@@ -1,6 +1,4 @@
 // Waits for the database, runs the idempotent seed, then starts cms and web.
-// `cms` does not exist until U2 and `seed` until U3; both steps are skipped
-// while missing (`--if-present`).
 import { spawn, spawnSync } from 'node:child_process'
 import { connect } from 'node:net'
 import { rootDir } from './load-env.mjs'
