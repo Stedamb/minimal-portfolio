@@ -1,0 +1,62 @@
+---
+import { verifyPreviewToken } from '@repo/shared/preview-token';
+import HomeView from '../../views/HomeView.astro';
+import ProjectView from '../../views/ProjectView.astro';
+import type { ProfileView } from '../../lib/mappers';
+import { getPreviewProfile, getPreviewProject, getProfile } from '../../lib/payload';
+import { parsePreviewTarget, previewHeaders } from '../../lib/preview';
+import { isLocale } from '../../lib/i18n';
+import { cmsUrl, env } from '../../lib/env';
+
+// Live preview. Never cached: no `Astro.cache.set`, and every response says so.
+//  - GET renders the saved draft, read with the preview API key.
+//  - POST receives the admin's unsaved form state, has Payload merge it into the document and
+//    renders the same page, so the frame can morph it in.
+// The token in the query is verified before anything is read from Payload.
+
+const headers = previewHeaders(cmsUrl());
+const refuse = (status: number, message: string) => new Response(message, { status, headers });
+for (const [name, value] of Object.entries(headers)) Astro.response.headers.set(name, value);
+
+const { method } = Astro.request;
+const target = parsePreviewTarget(Astro.params.target);
+if (method !== 'GET' && method !== 'POST') return refuse(405, 'Method not allowed');
+if (!target) return refuse(404, 'Not found');
+
+const verdict = await verifyPreviewToken({
+  secret: env('PREVIEW_SECRET') ?? '',
+  token: Astro.url.searchParams.get('token'),
+  target: target.path,
+});
+if (!verdict.ok || !isLocale(verdict.locale)) return refuse(401, 'Unauthorized');
+const locale = verdict.locale;
+
+let data: object | undefined;
+if (method === 'POST') {
+  const body = (await Astro.request.json().catch(() => null)) as { data?: unknown } | null;
+  if (!body?.data || typeof body.data !== 'object' || Array.isArray(body.data)) return refuse(400, 'Expected { data: object }');
+  data = body.data;
+}
+
+let project = null;
+let profile = null;
+let siteProfile: ProfileView | undefined;
+try {
+  if (target.kind === 'project') {
+    // The layout needs the published profile too; a failure there is left for the layout to raise.
+    [project, siteProfile] = await Promise.all([getPreviewProject(target.id, locale, data), getProfile(locale).catch(() => undefined)]);
+  } else profile = await getPreviewProfile(locale, data);
+} catch (error) {
+  console.error('[preview]', error);
+  return refuse(502, 'Preview unavailable');
+}
+if (!project && !profile) return refuse(404, 'Not found');
+---
+
+{
+  target.kind === 'project' ? (
+    <ProjectView locale={locale} project={project} profile={siteProfile} preview />
+  ) : (
+    <HomeView locale={locale} profile={profile!} preview />
+  )
+}

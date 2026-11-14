@@ -1,0 +1,18 @@
+---
+import { switchLocalePath, t, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+  pathname: string;
+}
+
+// Links to the same page in the other language, so the current project is kept.
+const { locale, pathname } = Astro.props;
+const target: Locale = locale === 'it' ? 'en' : 'it';
+---
+
+<h5>
+  <a class="Link-Alt" href={switchLocalePath(pathname, locale)} hreflang={target} lang={target} aria-label={t(locale).nav.switchLanguage}>
+    {target.toUpperCase()}
+  </a>
+</h5>

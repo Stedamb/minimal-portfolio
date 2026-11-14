@@ -1,61 +1,150 @@
 # Minimal Portfolio
 
-A minimal, editorial portfolio template for visual artists: filmmakers, videomakers and photographers who want their work to fill the screen with as little interface around it as possible.
+A photography portfolio built with [Payload CMS](https://payloadcms.com) and [Astro](https://astro.build). It is the owner's real site, and it doubles as a worked example of what Payload can do for a small editorial site:
 
-**Live demo:** [videomaker-v2.vercel.app](https://videomaker-v2.vercel.app)
+- **Live preview**: the admin shows the public page next to the form and updates it as you type, without saving.
+- **Drafts, autosave and versions**: projects and the profile stay drafts until published, with a version history.
+- **Scheduled publishing**: pick a date and a project goes live on its own.
+- **Localization**: Italian (default, at `/`) and English (at `/en`), with English falling back to Italian.
+- **Form builder**: the contact form is a Payload form, and submissions are stored in the CMS.
+- **MCP**: an MCP endpoint lets an AI client such as Claude Code read content and draft changes.
 
-Where [Videomaker Portfolio](https://github.com/Stedamb/videomaker-portfolio) is a video journal built around React islands and page transitions, this one is a lighter template: fully static Astro with no UI framework. Every interactive detail is a small inline script.
+The public site is plain Astro with no UI framework: server-rendered pages, cached on the CDN and purged by tag when content is published. The admin and API live in a separate Payload app.
 
-## Features
+**Live site:** `<web url>` | **Admin:** `<cms url>/admin`
 
-- **Work first**: full-bleed media, large serif and grotesk typography, and a scrolling client marquee
-- **Project pages**: each project lists client, role, date and credits, with its own gallery and a fullscreen viewer
-- **Light on the network**: videos load lazily as they scroll into view, WebM is served before MP4 when present, and posters keep the layout stable
-- **Small touches**: Lenis smooth scrolling and a custom cursor
-- **Content in one place**: projects and profile are plain TypeScript files with typed data
+<video src="docs/media/editing-demo.webm" controls muted width="800"></video>
 
-Projects are made of video clips today. Still-image (photography) projects are the next addition.
+If the video does not play in your viewer, open [docs/media/editing-demo.webm](docs/media/editing-demo.webm). It shows editing a project, autosave, version history and the schedule dialog, which the demo account cannot use.
 
-## Tech stack
+## Architecture
 
-| Area      | Tooling                                    |
-| --------- | ------------------------------------------ |
-| Framework | Astro 7 (static output, no UI framework)   |
-| Styling   | Tailwind CSS 4 (`@tailwindcss/vite`)       |
-| Motion    | Lenis, CSS                                 |
-| Language  | TypeScript                                 |
-| Packages  | pnpm                                       |
+A pnpm monorepo with two deployable apps and one shared package.
 
-## Getting started
+| Path              | What                                                                            |
+| ----------------- | ------------------------------------------------------------------------------- |
+| `apps/cms`        | Payload 3 on Next.js 16: admin, REST API, MCP endpoint, Postgres, media storage |
+| `apps/web`        | Astro 7 (`output: 'server'`, Vercel adapter): the public site                   |
+| `packages/shared` | Code both apps need, such as the live-preview token                             |
 
-Requires Node.js 22.12 or later and [pnpm](https://pnpm.io) (`corepack enable` picks up the pinned version).
+```mermaid
+flowchart LR
+  visitor([Visitor]) --> web
+  editor([Editor]) --> cms
+  claude([MCP client]) -->|/api/mcp| cms
+  web["web (Astro)"] -->|published content, drafts for preview, contact form| cms
+  cms["cms (Payload + Next)"] -->|purge cache tags on publish| web
+  cms -.->|live preview iframe| web
+  cms --> db[(Postgres)]
+  cms --> blob[(Media storage)]
+  cron([Vercel Schedule]) -->|every 15 min| cms
+```
+
+- **Data**: Postgres through `@payloadcms/db-postgres`. Locally it is PGlite, in production Neon. Schema changes are committed migrations (`apps/cms/src/migrations`), applied by `pnpm --filter cms migrate` and by every `cms` build.
+- **Media**: Vercel Blob when `BLOB_READ_WRITE_TOKEN` is set, otherwise files in `apps/cms/media/`.
+- **Caching**: pages set cache tags through Astro route caching on Vercel's CDN. On publish, the CMS calls `web` at `/api/revalidate` (bearer `REVALIDATE_SECRET`) and the affected tags are purged.
+- **Scheduled publishing**: on Vercel, a Vercel Schedule (`apps/cms/vercel.json`) calls `/api/payload-jobs/run` every 15 minutes. Anywhere else, the CMS polls its own job queue every minute.
+- **Roles**: `owner` (everything), `demo` (the public, read-only login), and two API-key service users: `preview` (lets `web` read drafts for live preview) and `submitter` (lets `web` post contact form submissions).
+
+More detail: [docs/architecture.md](docs/architecture.md) explains each part (the demo guard, caching and purge, live preview, scheduling, the contact form, MCP), and [docs/process.md](docs/process.md) describes how the project was planned, built and reviewed.
+
+## Try the demo
+
+Open `<cms url>/admin` and sign in with:
+
+- Email: `<demo email>`
+- Password: `<demo password>`
+
+The demo account can explore the whole admin, open any project, edit fields and use live preview. It never saves or uploads anything: Save and Publish show a notice, autosave is rejected silently, and a reload brings back the original content. Users, form submissions and API keys are hidden from it, and the schedule control is visible but disabled.
+
+## Live preview
+
+Open a project (or the Profile) in the admin and click Live Preview. Type in a field and the preview pane re-renders the real page, in the language you are editing, from the unsaved form state. Mobile, tablet and desktop widths are available. The public site is not touched: visitors keep seeing the published version. It works for the demo account too, since nothing needs to be saved.
+
+The preview pane is an iframe of a `web` route (`/preview/...`). Its URL carries a token, signed with `PREVIEW_SECRET`, for exactly that document and locale, so `web` needs no admin cookies.
+
+## Connect Claude Code over MCP
+
+The CMS serves MCP at `/api/mcp` (through `@payloadcms/plugin-mcp`). Clients can find, create and update projects and the profile, and edit the details of uploaded images and videos (new media is uploaded in the admin). Nothing can be deleted. Tools run with the key owner's access rules. The tool descriptions ask the client to save drafts (`draft: true`) so the owner reviews changes before publishing, but a client that leaves it out publishes directly: only tick the tools you trust the client with.
+
+API keys are created by the owner in the admin (the MCP API Keys collection, visible to the owner only). Each key has per-tool checkboxes, which are off by default: tick only what the client needs.
+
+```sh
+claude mcp add --transport http portfolio https://<cms-domain>/api/mcp --header "Authorization: Bearer <MCP_API_KEY>"
+```
+
+`<MCP_API_KEY>` is the value shown when the owner creates the key. It is not an environment variable of this repo.
+
+## Local setup
+
+Requires Node.js 24 and [pnpm](https://pnpm.io) (`corepack enable` picks up the pinned version).
 
 ```sh
 pnpm install
-pnpm dev       # dev server at http://localhost:4321
-pnpm build     # type-check, then static build to dist/
-pnpm preview   # serve the build
+pnpm dev
 ```
 
-## Content
+`pnpm dev` starts an embedded Postgres (PGlite, data in `.pglite/`), applies the migrations, seeds sample content and the accounts, and starts both apps. No Docker and no account needed.
 
-All content lives in `src/data/`:
+- Site: http://localhost:4321
+- Admin: http://localhost:3000/admin. Owner login `owner@example.com` / `local-owner-password`, demo login `demo@example.com` / `local-demo-password`. These are the local placeholders from `.env.example`.
 
-- `projects.ts`: the project list. Every entry gets a page at `/projects/<slug>`. Entries with `featured: true` also appear on the homepage, and the first video of a project is its cover.
-- `profile.ts`: name, bio, contact details, hero video and the clients in the homepage marquee. **The contact details are placeholders.**
+With no `.env`, the scripts use `.env.example`; copy it to `.env` to change values. If you would rather use a real Postgres, `docker compose up -d` serves Postgres 17 on the same URL, and `pnpm dev:apps` starts the apps without PGlite.
 
-Videos go in `public/videos/<slug>/` as `N.mp4`, with an optional `N.webm` (served first when present) and `N-poster.jpg`. To encode a clip:
+### Tests
 
 ```sh
-ffmpeg -i in.mov -an -vf "scale='min(1280,iw)':-2" -c:v libx264 -crf 28 -preset slow -pix_fmt yuv420p -movflags +faststart 1.mp4
-ffmpeg -i in.mov -an -vf "scale='min(1280,iw)':-2" -c:v libvpx-vp9 -crf 40 -b:v 0 -row-mt 1 1.webm
-ffmpeg -ss 1 -i 1.mp4 -frames:v 1 -q:v 5 1-poster.jpg
+pnpm --filter cms test:int   # Payload integration tests, in their own schema of the local database (start it with `pnpm db`)
+pnpm --filter cms test:e2e   # Playwright, on its own stack and database (ports 3300, 4400, 5532)
+pnpm --filter web test       # Vitest unit tests
 ```
 
-## Sample media credits
+Playwright needs a browser once: `pnpm --filter cms exec playwright install chromium`. To regenerate the recording in `docs/media/`, run `pnpm --filter cms record:demo`; it is not part of `test:e2e`.
 
-The Big Buck Bunny, Sintel, Tears of Steel and Elephants Dream clips are excerpts from films © Blender Foundation | [studio.blender.org](https://studio.blender.org), licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). They are placeholders, to be replaced with your own work.
+## Environment variables
+
+All of them are in `.env.example`, whose values work as they are for local development. On Vercel, set them in each project's settings (the table says which app reads what).
+
+| Variable                          | Read by  | Purpose                                                                                                                                         |
+| --------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`                    | cms      | Postgres connection string. Production: Neon's pooled URL.                                                                                      |
+| `PGLITE_PORT`                     | scripts  | Port of the local PGlite server (default 5432).                                                                                                 |
+| `PGLITE_DATA_DIR`                 | scripts  | Data directory of the local PGlite server (default `.pglite`).                                                                                  |
+| `PAYLOAD_SECRET`                  | cms      | Payload's signing secret. Use a long random string in production.                                                                               |
+| `OWNER_EMAIL`, `OWNER_PASSWORD`   | seed     | The owner account the seed creates.                                                                                                             |
+| `DEMO_EMAIL`, `DEMO_PASSWORD`     | seed     | The read-only demo account the seed creates. Skipped if either is empty.                                                                        |
+| `PREVIEW_API_KEY`                 | seed, web | API key of the `preview` service user (the seed creates the user). `web` sends it to read drafts for live preview.                             |
+| `SUBMITTER_API_KEY`               | seed, web | API key of the `submitter` service user. `web` sends it to post contact form submissions.                                                      |
+| `PREVIEW_SECRET`                  | cms, web | Signs and verifies live-preview tokens.                                                                                                         |
+| `REVALIDATE_SECRET`               | cms, web | Bearer secret of the cache-purge endpoint on `web`.                                                                                             |
+| `CRON_SECRET`                     | cms      | Must be set on Vercel. Vercel sends it as a bearer token on scheduled calls, and the CMS refuses job runs without a match, so scheduled publishing does not run if it is missing. |
+| `CONTACT_FORM_SECRET`             | web      | Signs the contact form's render timestamp and salts the stored IP hash. Use a long random string in production.                                 |
+| `VERCEL_AUTOMATION_BYPASS_SECRET` | cms, web | Production only. Sent as `x-vercel-protection-bypass` on calls between the two projects, so they get through Vercel Authentication.            |
+| `BLOB_READ_WRITE_TOKEN`           | cms      | Vercel Blob token. Empty locally: media goes to `apps/cms/media/`.                                                                              |
+| `CMS_URL`                         | cms, web | Public URL of the CMS (default `http://localhost:3000`).                                                                                        |
+| `WEB_URL`                         | cms, web | Public URL of the site (default `http://localhost:4321`).                                                                                       |
+
+Never commit real values: `.env*` is git-ignored except `.env.example`.
+
+## Production setup
+
+Deployment is two Vercel projects from this repo. The build settings are in `apps/cms/vercel.json` and `apps/web/vercel.json`; the rest is dashboard work, done by the owner.
+
+1. **Projects and domains**: create two projects from the repository, with Root Directory `apps/cms` and `apps/web`. Keep "Include source files outside of the Root Directory" on, so `packages/shared` is available. Attach the domains, then set `CMS_URL` and `WEB_URL` to them in both projects.
+2. **Database**: add Neon from the Vercel Marketplace to the `cms` project, with preview branching on so each preview deployment gets its own branch. Use the pooled URL as `DATABASE_URL`. Every `cms` build runs the migrations against it.
+3. **Media**: create a Blob store and connect it to `cms`. That sets `BLOB_READ_WRITE_TOKEN`.
+4. **Secrets**: set every variable in the table above, with long random values for the secrets. `CRON_SECRET` must be set on `cms`. `PREVIEW_SECRET`, `REVALIDATE_SECRET`, `PREVIEW_API_KEY` and `SUBMITTER_API_KEY` must have the same value in both projects.
+5. **Protection Bypass for Automation**: enable it in both projects and set `VERCEL_AUTOMATION_BYPASS_SECRET` to the same value in both, so server-to-server calls pass Vercel Authentication.
+6. **Rate-limit the login**: in the `cms` project's Vercel Firewall, add a rate-limit rule on `/api/users/login`, which the admin signs in through, and on `/api/graphql`, which also offers a login mutation. Account lockout is off (`maxLoginAttempts: 0`) so nobody can lock the public demo account, which makes this rule the only brute-force protection, owner account included.
+7. **Seed**: before sharing the CMS URL, run the seed once against the production database: `pnpm --filter cms seed`, with the production values of `DATABASE_URL`, `PAYLOAD_SECRET`, `OWNER_EMAIL`, `OWNER_PASSWORD`, `DEMO_EMAIL`, `DEMO_PASSWORD`, `PREVIEW_API_KEY` and `SUBMITTER_API_KEY` exported in your shell (shell values win over `.env`). It creates the owner first, and the other accounts only once an owner exists. Accounts that already exist are left alone. It also creates the sample projects, which you can unpublish or replace. Against a remote database the seed refuses to run while any password or API key still has its `.env.example` value, and on Vercel the scripts never fall back to `.env.example`.
+8. **Check**: the site renders, the admin loads, the demo login works and live preview shows the page. Check live preview on the production domains: on a protected preview deployment, the editor would also need to be signed in to Vercel.
+
+Preview deployments of the two projects are not linked to each other automatically; a `web` preview reads from whatever `CMS_URL` is set to.
+
+## Media credits
+
+Sample photos and clips are credited in [apps/cms/src/seed/media/CREDITS.md](apps/cms/src/seed/media/CREDITS.md).
 
 ## License
 
-Code is released under the [MIT License](LICENSE). The profile photo is © Stefano D'Ambrosio, and the sample clips keep their own licence (see above). Neither is covered by the MIT License.
+Code is released under the [MIT License](LICENSE). The sample photos and clips keep their own licences (see the credits) and are not covered by the MIT License.

@@ -1,0 +1,16 @@
+---
+import ArrowLink from './ArrowLink.astro';
+import { localePath, t, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const strings = t(locale).notFound;
+---
+
+<div class="container-xl pb-20">
+  <p class="pb-4">{strings.message}</p>
+  <ArrowLink href={localePath(locale, '/')} label={strings.back} />
+</div>

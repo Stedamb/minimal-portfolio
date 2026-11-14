@@ -1,0 +1,21 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import ProjectSection from '../components/sections/ProjectSection.astro';
+import { getProfile, getProjects } from '../lib/payload';
+import { t, type Locale } from '../lib/i18n';
+import { cachePage, mediaTagsOf, pageTags } from '../lib/cache';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const [profile, projects] = await Promise.all([getProfile(locale), getProjects(locale)]);
+cachePage(Astro.cache, pageTags.portfolio(locale), mediaTagsOf(projects.map((p) => p.cover)));
+---
+
+<PageLayout title={t(locale).titles.portfolio} locale={locale} profile={profile}>
+  <main>
+    {projects.map((project) => <ProjectSection project={project} locale={locale} />)}
+  </main>
+</PageLayout>

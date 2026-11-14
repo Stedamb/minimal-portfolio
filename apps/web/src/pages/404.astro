@@ -1,0 +1,9 @@
+---
+import ProjectView from '../views/ProjectView.astro';
+import { localeFromPath } from '../lib/i18n';
+
+// Unmatched URLs land here in both languages; the prefix picks the language.
+Astro.response.status = 404;
+---
+
+<ProjectView locale={localeFromPath(Astro.url.pathname)} project={null} />

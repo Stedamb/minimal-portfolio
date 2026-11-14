@@ -1,0 +1,78 @@
+/* Site styles sit between preflight and utilities: they must beat the base reset (e.g. container margins)
+   but still lose to utility classes, which is how specificity resolved it in v3. */
+@layer theme, base, site, components, utilities;
+
+@import "./components/infinite-scroll.css" layer(site);
+@import "./components/custom-cursor.css" layer(site);
+@import "./components/loader.css" layer(site);
+
+@import "./container.css" layer(site);
+@import "./multimedia.css" layer(site);
+@import "./typography.css" layer(site);
+@import "./section.css" layer(site);
+
+@import "tailwindcss";
+
+@theme inline {
+    --color-*: initial;
+    --color-primary: var(--primary);
+    --color-secondary: var(--secondary);
+    --color-tertiary: var(--tertiary);
+    --color-text: var(--text);
+    --color-background: var(--background);
+    --color-accent: var(--accent);
+    --color-shadow: var(--shadow);
+}
+
+@custom-variant 2xl-max (@media (max-width: 1535px));
+@custom-variant xl-max (@media (max-width: 1279px));
+@custom-variant lg-max (@media (max-width: 1023px));
+@custom-variant md-max (@media (max-width: 767px));
+@custom-variant sm-max (@media (max-width: 639px));
+
+:root {
+    /* Palette is fixed (no dark variant), so don't let the UA switch form controls to dark. */
+    color-scheme: light;
+
+    /* Realtime Colors */
+    --text: #090909;
+    --background: #f5f5f5;
+    --primary: #0055ff;
+    --secondary: #88ff00;
+    --tertiary: #e0e0e0;
+    --accent: #0055ff;
+    --shadow: #eeeeee;
+
+    color: var(--text);
+    background-color: var(--background);
+
+    /* How far a box title (.Box-Title) hangs below the top border of its box. */
+    --box-title-overlap: calc(0.75rem + 2px);
+
+    /* Fonts */
+    font-size: 12px !important;
+
+    @media screen and (min-width: 768px) {
+        font-size: 18px !important;
+    }
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+}
+
+.hide {
+    opacity: 0;
+}

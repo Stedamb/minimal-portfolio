@@ -1,0 +1,22 @@
+---
+import LanguageSwitch from './LanguageSwitch.astro';
+import { localePath, t, type Locale } from '../lib/i18n';
+
+interface Props {
+  name: string;
+  locale: Locale;
+  pathname: string;
+}
+
+const { name, locale, pathname } = Astro.props;
+const strings = t(locale);
+---
+
+<div class="w-full flex justify-between container-min py-4">
+  <h5><a class="Link-Alt" href={localePath(locale, '/')}>{name}</a></h5>
+  <div class="flex gap-8">
+    <h5><a class="Link-Alt" href={localePath(locale, '/portfolio')}>{strings.nav.work}</a></h5>
+    <h5><a class="Link-Alt" href={localePath(locale, '/info')}>{strings.nav.info}</a></h5>
+    <LanguageSwitch locale={locale} pathname={pathname} />
+  </div>
+</div>

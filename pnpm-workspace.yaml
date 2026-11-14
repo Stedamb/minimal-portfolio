@@ -1,2 +1,40 @@
+packages:
+  - apps/*
+  - packages/*
+
+# Single source of truth for versions that must move together.
+# Every @payloadcms/* package pins an exact `payload` peer, so they all use `catalog:`.
+catalog:
+  astro: 7.4.2
+  payload: 3.93.0
+  '@payloadcms/db-postgres': 3.93.0
+  '@payloadcms/live-preview': 3.93.0
+  '@payloadcms/next': 3.93.0
+  '@payloadcms/plugin-form-builder': 3.93.0
+  '@payloadcms/plugin-mcp': 3.93.0
+  '@payloadcms/richtext-lexical': 3.93.0
+  '@payloadcms/storage-vercel-blob': 3.93.0
+  '@payloadcms/ui': 3.93.0
+  next: ~16.4.5
+  react: ~19.3.1
+  react-dom: ~19.3.1
+
+# A fresh resolve picks the 2.0.0-beta runtime, which breaks @astrojs/check
+# (wasm bindings pin @emnapi/core 1.x). Keep the stable release.
+overrides:
+  "@emnapi/runtime": 1.11.3
+
 allowBuilds:
   esbuild: true
+  sharp: true
+
+minimumReleaseAgeExclude:
+  - '@electric-sql/pglite-age@0.0.17'
+  - '@electric-sql/pglite-pg_hashids@0.0.17'
+  - '@electric-sql/pglite-pg_ivm@0.0.17'
+  - '@electric-sql/pglite-pg_textsearch@0.0.18'
+  - '@electric-sql/pglite-pg_uuidv7@0.0.17'
+  - '@electric-sql/pglite-pgtap@0.0.17'
+  - '@electric-sql/pglite-pgvector@0.0.17'
+  - '@electric-sql/pglite-socket@0.2.19'
+  - '@electric-sql/pglite@0.5.16'

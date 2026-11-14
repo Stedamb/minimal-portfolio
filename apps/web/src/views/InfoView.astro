@@ -1,0 +1,26 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import Contact from '../components/Contact.astro';
+import { getContactForm, getProfile } from '../lib/payload';
+import { contactEnv, signRenderToken, type ContactResult } from '../lib/form-guard';
+import { t, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+  /** Outcome of a post made without JavaScript. */
+  result?: ContactResult;
+}
+
+const { locale, result } = Astro.props;
+// Not route-cached: the form carries a signed render timestamp, which must be fresh. Without
+// a configured secret the form can't be checked, so the e-mail card stays.
+const { secret } = contactEnv();
+const [profile, form] = await Promise.all([getProfile(locale), secret ? getContactForm(locale).catch(() => null) : null]);
+const token = form ? signRenderToken(secret) : '';
+---
+
+<PageLayout title={t(locale).titles.info} locale={locale} profile={profile}>
+  <main>
+    <Contact profile={profile} locale={locale} form={form} token={token} result={result} />
+  </main>
+</PageLayout>

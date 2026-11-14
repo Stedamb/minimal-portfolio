@@ -1,0 +1,12 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "buildCommand": "pnpm build",
+  "schedules": {
+    "payload-jobs": {
+      "schedule": "*/15 * * * *",
+      "path": "/api/payload-jobs/run",
+      "requestMethod": "GET"
+    }
+  }
+}

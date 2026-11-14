@@ -1,0 +1,29 @@
+---
+interface Props {
+  items: string[];
+}
+
+const { items } = Astro.props;
+---
+
+<div class="scrolling-banner py-16">
+  <div class="text-container" data-marquee>
+    <div class="scrolling-text">
+      <div class="flex">
+        {
+          items.map((item) => (
+            <span class="flex gap-5 pl-5">
+              {item} <img src="/asterisk.svg" class="w-3" alt="" />
+            </span>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { initMarquee } from '../../scripts/marquee';
+
+  initMarquee();
+</script>

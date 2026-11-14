@@ -1,0 +1,19 @@
+# Fallback local database if PGlite (pnpm dev) does not suit you.
+# Start it with `docker compose up -d`, then run the apps without the db script:
+#   pnpm dev:apps
+# Matches DATABASE_URL in .env.example.
+services:
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

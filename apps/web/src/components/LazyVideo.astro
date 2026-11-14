@@ -1,0 +1,23 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import type { VideoItem } from '../lib/mappers';
+import { t, type Locale } from '../lib/i18n';
+
+interface Props extends HTMLAttributes<'video'> {
+  video: VideoItem;
+  locale: Locale;
+}
+
+const { video, locale, ...rest } = Astro.props;
+---
+
+<video data-lazy-video muted loop playsinline preload="none" poster={video.poster} {...rest}>
+  {video.sources.map((source) => <source src={source.src} type={source.type} />)}
+  {t(locale).videoUnsupported}
+</video>
+
+<script>
+  import { initLazyVideos } from '../scripts/lazy-video';
+
+  initLazyVideos();
+</script>

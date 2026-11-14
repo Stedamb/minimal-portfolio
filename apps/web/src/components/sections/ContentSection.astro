@@ -1,0 +1,40 @@
+---
+import MediaItem from '../MediaItem.astro';
+import ArrowLink from '../ArrowLink.astro';
+import { localePath, t, type Locale } from '../../lib/i18n';
+import type { ProjectView } from '../../lib/mappers';
+
+interface Props {
+  project: ProjectView;
+  isRight: boolean;
+  locale: Locale;
+}
+
+const { project, isRight, locale } = Astro.props;
+---
+
+<div class="ContentSection container-xl lg:pb-32">
+  <div class="relative flex items-start justify-center flex-col">
+    {
+      project.cover && (
+        <MediaItem
+          item={project.cover}
+          locale={locale}
+          class:list={['Video lg:w-3/4 object-cover h-full', { 'lg:ml-auto': !isRight }]}
+          photoClass="w-full"
+          sizes="(min-width: 1024px) 75vw, 100vw"
+        />
+      )
+    }
+    <div
+      class:list={[
+        'Staggered flex flex-col w-5/6 mx-auto lg-max:translate-y-[-50%] lg:absolute lg:w-1/3 p-4 lg:p-8 bg-background border border-text',
+        isRight ? 'lg:right-0' : 'lg:left-0',
+      ]}
+    >
+      <h4>{project.title}</h4>
+      <p>{project.preview}</p>
+      <ArrowLink href={localePath(locale, `/projects/${project.slug}`)} label={t(locale).project.discoverMore} class="justify-center ml-auto" />
+    </div>
+  </div>
+</div>

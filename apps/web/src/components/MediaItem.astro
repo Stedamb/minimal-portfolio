@@ -1,0 +1,26 @@
+---
+import LazyVideo from './LazyVideo.astro';
+import Photo from './Photo.astro';
+import type { MediaItem } from '../lib/mappers';
+import type { Locale } from '../lib/i18n';
+
+interface Props {
+  item: MediaItem;
+  locale: Locale;
+  class?: string;
+  /** Extra classes for photos only (videos size themselves). */
+  photoClass?: string;
+  sizes?: string;
+}
+
+// A photo takes exactly the slot a video would, so covers and galleries treat both alike.
+const { item, locale, class: className, photoClass, sizes } = Astro.props;
+---
+
+{
+  item.kind === 'photo' ? (
+    <Photo photo={item} class:list={[className, photoClass]} sizes={sizes} />
+  ) : (
+    <LazyVideo video={item} locale={locale} class={className} />
+  )
+}
