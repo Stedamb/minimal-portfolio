@@ -25,7 +25,7 @@ const toBase64Url = (bytes: Uint8Array): string => {
   return btoa(binary).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_')
 }
 
-const fromBase64Url = (value: string): Uint8Array => {
+const fromBase64Url = (value: string): Uint8Array<ArrayBuffer> => {
   if (!/^[A-Za-z0-9_-]*$/.test(value)) throw new Error('bad base64url')
   const padded = value.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(value.length / 4) * 4, '=')
   return Uint8Array.from(atob(padded), (char) => char.charCodeAt(0))

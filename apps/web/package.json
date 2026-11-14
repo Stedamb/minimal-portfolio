@@ -12,22 +12,22 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.9.12",
-    "@astrojs/vercel": "11.0.20",
+    "@astrojs/vercel": "11.0.21",
     "@payloadcms/live-preview": "catalog:",
     "@repo/shared": "workspace:*",
     "@tailwindcss/vite": "^4.3.3",
-    "@vercel/functions": "3.11.0",
+    "@vercel/functions": "3.11.2",
     "astro": "catalog:",
     "idiomorph": "0.8.0",
     "lenis": "^1.3.27",
     "tailwindcss": "^4.3.3",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.3"
   },
   "engines": {
-    "node": "24.x"
+    "node": "26.x"
   },
   "devDependencies": {
-    "happy-dom": "20.14.6",
-    "vitest": "4.1.12"
+    "happy-dom": "21.0.4",
+    "vitest": "5.1.0"
   }
 }
