@@ -3,7 +3,7 @@
 import { Button, PublishButton as DefaultPublishButton, useTranslation } from '@payloadcms/ui'
 
 import { showDemoNotice, useDemo } from './demo'
-import { ScheduleNote } from './ScheduleNote'
+import { ScheduleNote, ScheduleNoteInDrawer } from './ScheduleNote'
 
 export function PublishButton(props: Parameters<typeof DefaultPublishButton>[0]) {
   const { isDemo, text } = useDemo()
@@ -12,7 +12,7 @@ export function PublishButton(props: Parameters<typeof DefaultPublishButton>[0])
     return (
       <>
         <DefaultPublishButton {...props} />
-        <ScheduleNote />
+        <ScheduleNoteInDrawer />
       </>
     )
   return (
