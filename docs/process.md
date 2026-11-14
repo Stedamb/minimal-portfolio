@@ -85,6 +85,17 @@ The review also led to fixes beyond the six:
 
 The work went up as one pull request. Its description records the test results, the review run and the findings still open. Deployment itself (two Vercel projects, the Neon database, Blob, secrets, the firewall rule and the first seed) is left to the owner, as the README's production setup describes.
 
+## 6. Going live
+
+Deployment followed the README's production setup, with a few surprises worth recording:
+
+- **Blob credentials.** New Blob stores connect through OIDC and expose no read-write token in the usual place, and an older store turned out to be private. Payload's adapter needs a token and a public store, so the fix was a public store plus its read-write token.
+- **Media through functions.** Every image and video was streamed through an uncached CMS function. Since media is public, the URLs now point straight at the Blob CDN.
+- **Pages never cached.** The homepage and portfolio set their cache headers after awaiting data inside a nested component, when the response had already started streaming. Only project pages, whose route loaded the data, were cached. The routes now load the data and set the headers.
+- **The wrong region.** Functions ran in Washington while the database is in Frankfurt; both projects now run in `fra1`.
+- **A guidelines pass.** Three reviewers compared the code with the current Astro, Payload and Vercel docs. Their findings led to setting cache headers only in pages, Payload's `serverURL` and `csrf`, a hard failure without `PAYLOAD_SECRET`, and skipping builds of unaffected projects. The items kept as they were are listed under the known limits in [architecture.md](architecture.md).
+- **Dependencies.** Everything moved to its latest compatible release (TypeScript 6, not 7, which Astro's checker and Next do not support yet), Node 26, and pnpm overrides for the vulnerable packages Payload and the Vercel adapter pull in.
+
 ## What carried over well
 
 - **Make the decisions before writing code.** Most later disagreements could be settled by pointing back to a decision already made, such as "the demo never saves" or "Hobby, about 30 minutes".

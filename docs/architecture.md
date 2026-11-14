@@ -29,7 +29,7 @@ The two apps deploy as two Vercel projects from the same repo and only know each
 ## Content model
 
 - **Projects** (drafts, autosave, versions, scheduled publish): a title, client, role, date and credits, plus `items`, an ordered list of photo and video blocks that reference media by id. The first item is the cover on the homepage and in the portfolio list. `featured` and `order` decide the homepage and the sort order.
-- **Images** and **Videos**: upload collections. Images get responsive sizes from 640 to 2560 px wide, and videos can carry a WebM and an MP4 file plus a poster.
+- **Images** and **Videos**: upload collections. Images get responsive sizes from 640 to 2560 px wide, and videos can carry a WebM and an MP4 file plus a poster. Files live in a public Vercel Blob store and their URLs point straight at the Blob CDN (`disablePayloadAccessControl`), since media is readable by anyone anyway.
 - **Profile** (a global, with drafts): name, role, bio, portrait, homepage hero, client marquee and contact details.
 - **Forms** and **form submissions**, from `@payloadcms/plugin-form-builder`: the contact form's fields are content too.
 - **Localization**: Italian is the default and English falls back to it. The site serves Italian at `/` and English at `/en`.
@@ -57,7 +57,7 @@ The integration tests in `apps/cms/tests/int/demo-guard.int.spec.ts` act as the 
 
 ## Rendering and caching
 
-Every page is server-rendered on request and cached on Vercel's CDN through Astro's route cache (`cacheVercel()`), for up to 3 hours plus 60 seconds stale-while-revalidate. Each response declares tags (`packages/shared/src/cache-tags.ts`):
+Every page is server-rendered on request and cached on Vercel's CDN through Astro's route cache (`cacheVercel()`), for up to 3 hours plus 60 seconds stale-while-revalidate. The page files load the content and call `cachePage` (`src/lib/cache.ts`); the views only render. Astro only lets pages change the response, and a nested component that awaits data runs after the response has started streaming, so cache headers set there are lost. Each response declares tags (`packages/shared/src/cache-tags.ts`):
 
 | Page | Tags |
 | --- | --- |
@@ -67,6 +67,10 @@ Every page is server-rendered on request and cached on Vercel's CDN through Astr
 | Info | not cached: the contact form carries a fresh signed timestamp |
 
 **Purge on publish.** CMS hooks (`apps/cms/src/hooks/purge.ts`) compute which tags a change affects and call `POST /api/revalidate` on the site (bearer `REVALIDATE_SECRET`), which deletes them with `dangerouslyDeleteByTag`. The tag set is the union of the previous and the new published state, so unpublishing, un-featuring, or moving a photo from one project to another refreshes every page that showed it. Draft saves and autosaves never purge, because visitors never see drafts. The call runs under `waitUntil` with a timeout, so a slow site never slows down a save. The 3-hour `maxAge` is only a safety net for a lost purge.
+
+## Homepage hero
+
+The hero is an ASCII skyline drawn by a WebGL fragment shader (`apps/web/src/scripts/ascii-hero.ts`): a brutalist block with a cantilevered upper volume, Berlin's TV tower and a finned low block. Each character cell samples the scene once and picks a glyph from a small atlas by darkness, in the site's own colours. The cursor moves the light. It pauses off-screen and in hidden tabs, and draws a single frame for reduced motion. The hero photo or video picked in the Profile is the fallback when WebGL is unavailable; hidden, it never loads.
 
 ## Live preview
 
@@ -81,7 +85,7 @@ Nothing is saved, which is why live preview works for the demo account too. Prev
 
 ## Scheduled publishing
 
-Projects and the profile use Payload's `versions.drafts.schedulePublish`. A scheduled publish is a job in the Payload jobs queue. On Vercel, a Vercel Schedule in `apps/cms/vercel.json` calls `/api/payload-jobs/run` every 15 minutes, authenticated with `CRON_SECRET`. On Hobby the run has up to 15 minutes of jitter, so a scheduled publish lands within about 30 minutes of the chosen time, and the admin says so. Locally, Payload's `jobs.autoRun` polls every minute instead. A scheduled publish goes through the same hooks, so it purges the cache like a manual one.
+Projects and the profile use Payload's `versions.drafts.schedulePublish`. A scheduled publish is a job in the Payload jobs queue. On Vercel, a Vercel Schedule in `apps/cms/vercel.json` calls `/api/payload-jobs/run` every 15 minutes, authenticated with `CRON_SECRET`. On Hobby the run has up to 15 minutes of jitter, so a scheduled publish lands within about 30 minutes of the chosen time, and the admin says so. The admin shows this note inside the schedule dialog. Payload has no slot there, so `ScheduleNote.tsx` finds the dialog by its class name. Locally, Payload's `jobs.autoRun` polls every minute instead. A scheduled publish goes through the same hooks, so it purges the cache like a manual one.
 
 ## Contact form
 
@@ -123,3 +127,7 @@ Submissions are visible to the owner only. There is no e-mail notification yet.
 - Account lockout is off so that nobody can lock the public demo login. Brute-force protection is a Vercel Firewall rate-limit rule, which the README asks the owner to add.
 - The MCP "drafts only" rule is a tool-description convention (see MCP above).
 - There is no CI workflow yet; the suites run locally.
+- `@astrojs/vercel` does not list Node 26 yet, so the site's functions run on Node 24 while the build and the CMS use 26.
+- The schedule note relies on Payload's internal `.schedule-publish__scheduler` class; if an update renames it, the note disappears and nothing else breaks.
+- Vercel Schedules are in beta. On Hobby a team gets 5,000 runs a month, and the 15-minute job uses about 3,000.
+- Hobby's Blob allowance (1 GB stored, 10 GB transfer a month) is small for video.

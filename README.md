@@ -9,9 +9,9 @@ A photography portfolio built with [Payload CMS](https://payloadcms.com) and [As
 - **Form builder**: the contact form is a Payload form, and submissions are stored in the CMS.
 - **MCP**: an MCP endpoint lets an AI client such as Claude Code read content and draft changes.
 
-The public site is plain Astro with no UI framework: server-rendered pages, cached on the CDN and purged by tag when content is published. The admin and API live in a separate Payload app.
+The public site is plain Astro with no UI framework: server-rendered pages, cached on the CDN and purged by tag when content is published. The homepage hero is an ASCII skyline (a brutalist block and Berlin's TV tower) drawn by a WebGL shader. The admin and API live in a separate Payload app.
 
-**Live site:** `<web url>` | **Admin:** `<cms url>/admin`
+**Live site:** https://minimal-portfolio-murex-one.vercel.app | **Admin:** https://minimal-portfolio-cms.vercel.app/admin
 
 <video src="docs/media/editing-demo.webm" controls muted width="800"></video>
 
@@ -41,8 +41,8 @@ flowchart LR
 ```
 
 - **Data**: Postgres through `@payloadcms/db-postgres`. Locally it is PGlite, in production Neon. Schema changes are committed migrations (`apps/cms/src/migrations`), applied by `pnpm --filter cms migrate` and by every `cms` build.
-- **Media**: Vercel Blob when `BLOB_READ_WRITE_TOKEN` is set, otherwise files in `apps/cms/media/`.
-- **Caching**: pages set cache tags through Astro route caching on Vercel's CDN. On publish, the CMS calls `web` at `/api/revalidate` (bearer `REVALIDATE_SECRET`) and the affected tags are purged.
+- **Media**: Vercel Blob when `BLOB_READ_WRITE_TOKEN` is set, otherwise files in `apps/cms/media/`. Media is public, so its URLs point straight at the Blob CDN and no function runs to serve a file.
+- **Caching**: pages set cache tags through Astro route caching on Vercel's CDN, from the page files (Astro only lets pages change the response). On publish, the CMS calls `web` at `/api/revalidate` (bearer `REVALIDATE_SECRET`) and the affected tags are purged.
 - **Scheduled publishing**: on Vercel, a Vercel Schedule (`apps/cms/vercel.json`) calls `/api/payload-jobs/run` every 15 minutes. Anywhere else, the CMS polls its own job queue every minute.
 - **Roles**: `owner` (everything), `demo` (the public, read-only login), and two API-key service users: `preview` (lets `web` read drafts for live preview) and `submitter` (lets `web` post contact form submissions).
 
@@ -50,7 +50,7 @@ More detail: [docs/architecture.md](docs/architecture.md) explains each part (th
 
 ## Try the demo
 
-Open `<cms url>/admin` and sign in with:
+Open https://minimal-portfolio-cms.vercel.app/admin and sign in with:
 
 - Email: `<demo email>`
 - Password: `<demo password>`
@@ -70,7 +70,7 @@ The CMS serves MCP at `/api/mcp` (through `@payloadcms/plugin-mcp`). Clients can
 API keys are created by the owner in the admin (the MCP API Keys collection, visible to the owner only). Each key has per-tool checkboxes, which are off by default: tick only what the client needs.
 
 ```sh
-claude mcp add --transport http portfolio https://<cms-domain>/api/mcp --header "Authorization: Bearer <MCP_API_KEY>"
+claude mcp add --transport http portfolio https://minimal-portfolio-cms.vercel.app/api/mcp --header "Authorization: Bearer <MCP_API_KEY>"
 ```
 
 `<MCP_API_KEY>` is the value shown when the owner creates the key. It is not an environment variable of this repo.
@@ -89,13 +89,15 @@ pnpm dev
 - Site: http://localhost:4321
 - Admin: http://localhost:3000/admin. Owner login `owner@example.com` / `local-owner-password`, demo login `demo@example.com` / `local-demo-password`. These are the local placeholders from `.env.example`.
 
-With no `.env`, the scripts use `.env.example`; copy it to `.env` to change values. If you would rather use a real Postgres, `docker compose up -d` serves Postgres 17 on the same URL, and `pnpm dev:apps` starts the apps without PGlite.
+With no `.env`, the scripts use `.env.example`; copy it to `.env` to change values. To see the site with the live content instead, run only the site against the production CMS: `CMS_URL=https://minimal-portfolio-cms.vercel.app pnpm --filter web dev`.
+
+If every local page takes about 8 seconds, check that `/etc/hosts` has a plain `127.0.0.1 localhost` line: when `localhost` is slow to resolve, the site's requests to the CMS hit their 8-second timeout. If you would rather use a real Postgres, `docker compose up -d` serves Postgres 17 on the same URL, and `pnpm dev:apps` starts the apps without PGlite.
 
 ### Tests
 
 ```sh
 pnpm --filter cms test:int   # Payload integration tests, in their own schema of the local database (start it with `pnpm db`)
-pnpm --filter cms test:e2e   # Playwright, on its own stack and database (ports 3300, 4400, 5532)
+pnpm --filter cms test:e2e   # Playwright, on its own stack and database (ports 3300, 4400, 5532); runs next to an open `pnpm dev`
 pnpm --filter web test       # Vitest unit tests
 ```
 
@@ -130,16 +132,16 @@ Never commit real values: `.env*` is git-ignored except `.env.example`.
 
 Deployment is two Vercel projects from this repo. The build settings are in `apps/cms/vercel.json` and `apps/web/vercel.json`; the rest is dashboard work, done by the owner.
 
-1. **Projects and domains**: create two projects from the repository, with Root Directory `apps/cms` and `apps/web`. Keep "Include source files outside of the Root Directory" on, so `packages/shared` is available. Attach the domains, then set `CMS_URL` and `WEB_URL` to them in both projects.
+1. **Projects and domains**: create two projects from the repository, with Root Directory `apps/cms` and `apps/web`. Keep "Include source files outside of the Root Directory" on, so `packages/shared` is available, and turn on skipping deployments for unaffected projects. Attach the domains, then set `CMS_URL` and `WEB_URL` to them in both projects. Both `vercel.json` files pin the functions to `fra1`; change it to the region of your database.
 2. **Database**: add Neon from the Vercel Marketplace to the `cms` project, with preview branching on so each preview deployment gets its own branch. Use the pooled URL as `DATABASE_URL`. Every `cms` build runs the migrations against it.
-3. **Media**: create a Blob store and connect it to `cms`. That sets `BLOB_READ_WRITE_TOKEN`.
+3. **Media**: create a **public** Blob store and connect it to `cms`. The Payload adapter needs a read-write token (`vercel_blob_rw_…`): newer stores connect through OIDC and only set `BLOB_STORE_ID`, so copy the store's read-write token into `BLOB_READ_WRITE_TOKEN` yourself. A private store does not work with the adapter.
 4. **Secrets**: set every variable in the table above, with long random values for the secrets. `CRON_SECRET` must be set on `cms`. `PREVIEW_SECRET`, `REVALIDATE_SECRET`, `PREVIEW_API_KEY` and `SUBMITTER_API_KEY` must have the same value in both projects.
 5. **Protection Bypass for Automation**: enable it in both projects and set `VERCEL_AUTOMATION_BYPASS_SECRET` to the same value in both, so server-to-server calls pass Vercel Authentication.
-6. **Rate-limit the login**: in the `cms` project's Vercel Firewall, add a rate-limit rule on `/api/users/login`, which the admin signs in through, and on `/api/graphql`, which also offers a login mutation. Account lockout is off (`maxLoginAttempts: 0`) so nobody can lock the public demo account, which makes this rule the only brute-force protection, owner account included.
-7. **Seed**: before sharing the CMS URL, run the seed once against the production database: `pnpm --filter cms seed`, with the production values of `DATABASE_URL`, `PAYLOAD_SECRET`, `OWNER_EMAIL`, `OWNER_PASSWORD`, `DEMO_EMAIL`, `DEMO_PASSWORD`, `PREVIEW_API_KEY` and `SUBMITTER_API_KEY` exported in your shell (shell values win over `.env`). It creates the owner first, and the other accounts only once an owner exists. Accounts that already exist are left alone. It also creates the sample projects, which you can unpublish or replace. Against a remote database the seed refuses to run while any password or API key still has its `.env.example` value, and on Vercel the scripts never fall back to `.env.example`.
+6. **Rate-limit the login**: in the `cms` project's Vercel Firewall, add one rate-limit rule for `POST` requests to `/api/users/login`, which the admin signs in through, and `/api/graphql`, which also offers a login mutation (for example 10 per minute per IP, then deny). Account lockout is off (`maxLoginAttempts: 0`) so nobody can lock the public demo account, which makes this rule the only brute-force protection, owner account included.
+7. **Seed**: before sharing the CMS URL, run the seed once against the production database: `pnpm --filter cms seed`, with the production values of `DATABASE_URL`, `PAYLOAD_SECRET`, `BLOB_READ_WRITE_TOKEN`, `OWNER_EMAIL`, `OWNER_PASSWORD`, `DEMO_EMAIL`, `DEMO_PASSWORD`, `PREVIEW_API_KEY` and `SUBMITTER_API_KEY` exported in your shell (shell values win over `.env`). If you keep them in a file and `source` it, quote each value: the Neon URL contains `&`. It creates the owner first, and the other accounts only once an owner exists. Accounts that already exist are left alone. It also creates the sample projects, which you can unpublish or replace. Against a remote database the seed refuses to run while any password or API key still has its `.env.example` value, and on Vercel the scripts never fall back to `.env.example`.
 8. **Check**: the site renders, the admin loads, the demo login works and live preview shows the page. Check live preview on the production domains: on a protected preview deployment, the editor would also need to be signed in to Vercel.
 
-Preview deployments of the two projects are not linked to each other automatically; a `web` preview reads from whatever `CMS_URL` is set to.
+Preview deployments of the two projects are not linked to each other automatically; a `web` preview reads from whatever `CMS_URL` is set to. A `cms` preview runs the migrations against its own `DATABASE_URL`, so keep Neon's preview branching on, or previews migrate the production database.
 
 ## Media credits
 
