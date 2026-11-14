@@ -50,9 +50,11 @@ export default buildConfig({
   },
   plugins: [
     // With no token the adapter disables itself and Payload stores files in `media/`.
+    // Media is public (read: () => true), so file URLs point straight at the Blob CDN
+    // instead of streaming every image and video through a CMS function.
     vercelBlobStorage({
       enabled: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
-      collections: { images: true, videos: true },
+      collections: { images: { disablePayloadAccessControl: true }, videos: { disablePayloadAccessControl: true } },
       token: process.env.BLOB_READ_WRITE_TOKEN,
       alwaysInsertFields: true,
       clientUploads: { access: clientUploadAccess },
