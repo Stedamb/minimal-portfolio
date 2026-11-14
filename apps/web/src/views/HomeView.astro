@@ -3,20 +3,22 @@ import PageLayout from '../layouts/PageLayout.astro';
 import Header from '../components/Header.astro';
 import ContentSection from '../components/sections/ContentSection.astro';
 import NavSection from '../components/sections/NavSection.astro';
-import { getProfile, getProjects } from '../lib/payload';
 import { t, type Locale } from '../lib/i18n';
-import type { ProfileView } from '../lib/mappers';
+import type { ProfileView, ProjectView } from '../lib/mappers';
 import { cachePage, mediaTagsOf, pageTags } from '../lib/cache';
 
+// The route loads the data: Astro starts streaming once a component awaits, so cache headers
+// set after an await in a nested component would never reach the response.
 interface Props {
   locale: Locale;
-  /** Live preview: the profile to show instead of the published one. The page is never cached. */
-  profile?: ProfileView;
+  profile: ProfileView;
+  /** Featured projects. */
+  projects: ProjectView[];
+  /** Live preview: the page is never cached. */
   preview?: boolean;
 }
 
-const { locale, preview = false } = Astro.props;
-const [profile, projects] = await Promise.all([Astro.props.profile ?? getProfile(locale), getProjects(locale, { featured: true })]);
+const { locale, profile, projects, preview = false } = Astro.props;
 if (!preview) cachePage(Astro.cache, pageTags.home(locale), mediaTagsOf([profile.photo, profile.hero, ...projects.map((p) => p.cover)]));
 ---
 

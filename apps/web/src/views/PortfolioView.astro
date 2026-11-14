@@ -1,16 +1,18 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
 import ProjectSection from '../components/sections/ProjectSection.astro';
-import { getProfile, getProjects } from '../lib/payload';
+import type { ProfileView, ProjectView } from '../lib/mappers';
 import { t, type Locale } from '../lib/i18n';
 import { cachePage, mediaTagsOf, pageTags } from '../lib/cache';
 
+// The route loads the data, so the cache headers are set before the response starts streaming.
 interface Props {
   locale: Locale;
+  profile: ProfileView;
+  projects: ProjectView[];
 }
 
-const { locale } = Astro.props;
-const [profile, projects] = await Promise.all([getProfile(locale), getProjects(locale)]);
+const { locale, profile, projects } = Astro.props;
 cachePage(Astro.cache, pageTags.portfolio(locale), mediaTagsOf(projects.map((p) => p.cover)));
 ---
 

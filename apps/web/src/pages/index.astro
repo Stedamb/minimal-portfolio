@@ -1,5 +1,8 @@
 ---
 import HomeView from '../views/HomeView.astro';
+import { getProfile, getProjects } from '../lib/payload';
+
+const [profile, projects] = await Promise.all([getProfile('it'), getProjects('it', { featured: true })]);
 ---
 
-<HomeView locale="it" />
+<HomeView locale="it" profile={profile} projects={projects} />

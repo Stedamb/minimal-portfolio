@@ -2,8 +2,8 @@
 import { verifyPreviewToken } from '@repo/shared/preview-token';
 import HomeView from '../../views/HomeView.astro';
 import ProjectView from '../../views/ProjectView.astro';
-import type { ProfileView } from '../../lib/mappers';
-import { getPreviewProfile, getPreviewProject, getProfile } from '../../lib/payload';
+import type { ProfileView, ProjectView as ProjectData } from '../../lib/mappers';
+import { getPreviewProfile, getPreviewProject, getProfile, getProjects } from '../../lib/payload';
 import { parsePreviewTarget, previewHeaders } from '../../lib/preview';
 import { isLocale } from '../../lib/i18n';
 import { cmsUrl, env } from '../../lib/env';
@@ -41,11 +41,12 @@ if (method === 'POST') {
 let project = null;
 let profile = null;
 let siteProfile: ProfileView | undefined;
+let featured: ProjectData[] = [];
 try {
   if (target.kind === 'project') {
     // The layout needs the published profile too; a failure there is left for the layout to raise.
     [project, siteProfile] = await Promise.all([getPreviewProject(target.id, locale, data), getProfile(locale).catch(() => undefined)]);
-  } else profile = await getPreviewProfile(locale, data);
+  } else [profile, featured] = await Promise.all([getPreviewProfile(locale, data), getProjects(locale, { featured: true })]);
 } catch (error) {
   console.error('[preview]', error);
   return refuse(502, 'Preview unavailable');
@@ -57,6 +58,6 @@ if (!project && !profile) return refuse(404, 'Not found');
   target.kind === 'project' ? (
     <ProjectView locale={locale} project={project} profile={siteProfile} preview />
   ) : (
-    <HomeView locale={locale} profile={profile!} preview />
+    <HomeView locale={locale} profile={profile!} projects={featured} preview />
   )
 }

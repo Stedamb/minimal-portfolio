@@ -1,5 +1,8 @@
 ---
 import PortfolioView from '../../views/PortfolioView.astro';
+import { getProfile, getProjects } from '../../lib/payload';
+
+const [profile, projects] = await Promise.all([getProfile('en'), getProjects('en')]);
 ---
 
-<PortfolioView locale="en" />
+<PortfolioView locale="en" profile={profile} projects={projects} />
