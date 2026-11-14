@@ -1,8 +1,10 @@
 ---
 import HomeView from '../views/HomeView.astro';
 import { getProfile, getProjects } from '../lib/payload';
+import { cachePage, mediaTagsOf, pageTags } from '../lib/cache';
 
 const [profile, projects] = await Promise.all([getProfile('it'), getProjects('it', { featured: true })]);
+cachePage(Astro.cache, pageTags.home('it'), mediaTagsOf([profile.photo, profile.hero, ...projects.map((p) => p.cover)]));
 ---
 
 <HomeView locale="it" profile={profile} projects={projects} />

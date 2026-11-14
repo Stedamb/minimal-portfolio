@@ -17,7 +17,22 @@ import { mcp } from './plugins/mcp'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
+// Origin only, no path. Locally the default dev URL; on Vercel set in the project.
+const serverURL = process.env.CMS_URL || 'http://localhost:3000'
+// Preview deployments run on their own *.vercel.app URL, so cookie requests from there are accepted too.
+const trustedOrigins = [serverURL, process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`].filter(
+  (origin): origin is string => Boolean(origin),
+)
+
+if (!process.env.PAYLOAD_SECRET && process.env.NODE_ENV === 'production') {
+  throw new Error('PAYLOAD_SECRET must be set in production')
+}
+
 export default buildConfig({
+  serverURL,
+  // Only these origins may make cookie-authenticated requests (the admin). The site talks to
+  // the API server-to-server with API keys, which this check does not apply to.
+  csrf: trustedOrigins,
   admin: {
     user: Users.slug,
     importMap: { baseDir: path.resolve(dirname) },

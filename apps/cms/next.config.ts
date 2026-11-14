@@ -7,6 +7,8 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // The e2e stack builds into its own folder, so it can run next to an open dev server.
+  distDir: process.env.NEXT_DIST_DIR || '.next',
   // The shared package ships TypeScript source.
   transpilePackages: ['@repo/shared'],
   turbopack: { root: path.resolve(dirname, '../..') },

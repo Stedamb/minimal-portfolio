@@ -1,6 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
+  "regions": [
+    "fra1"
+  ],
   "buildCommand": "pnpm build",
   "schedules": {
     "payload-jobs": {

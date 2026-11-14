@@ -25,6 +25,9 @@ export default async function globalSetup() {
   const env = { ...process.env }
   delete env.AI_AGENT
   delete env.CLAUDECODE
+  // The stack runs on its own ports, so it may start next to a dev server the developer already has open.
+  env.ASTRO_DEV_FLAGS = '--ignore-lock'
+  env.NEXT_DIST_DIR = '.next-e2e'
 
   let output = ''
   const stack = spawn('pnpm', ['dev'], { cwd: root, env, detached: true, stdio: ['ignore', 'pipe', 'pipe'] })

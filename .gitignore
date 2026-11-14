@@ -29,6 +29,7 @@ pnpm-debug.log*
 .pglite/
 apps/cms/media/
 .next/
+.next-e2e/
 
 
 # generated

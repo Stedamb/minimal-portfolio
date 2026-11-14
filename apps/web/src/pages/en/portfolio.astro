@@ -1,8 +1,10 @@
 ---
 import PortfolioView from '../../views/PortfolioView.astro';
 import { getProfile, getProjects } from '../../lib/payload';
+import { cachePage, mediaTagsOf, pageTags } from '../../lib/cache';
 
 const [profile, projects] = await Promise.all([getProfile('en'), getProjects('en')]);
+cachePage(Astro.cache, pageTags.portfolio('en'), mediaTagsOf(projects.map((p) => p.cover)));
 ---
 
 <PortfolioView locale="en" profile={profile} projects={projects} />

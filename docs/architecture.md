@@ -103,6 +103,8 @@ Submissions are visible to the owner only. There is no e-mail notification yet.
 - `scripts/load-env.mjs` loads `.env`, or `.env.example` on a fresh local clone, so `pnpm dev` works with no setup. On Vercel it never reads `.env.example`, so a missing secret fails the build instead of silently using a public default.
 - The seed refuses to run against a remote database while any password, API key or `PAYLOAD_SECRET` still has its `.env.example` value.
 - Locally the database is PGlite, a WASM build of Postgres served over the Postgres wire protocol (`scripts/dev-db.mjs`), so the CMS runs the same `@payloadcms/db-postgres` adapter as in production. Schema changes are committed migrations, applied by every `cms` build.
+- Both Vercel projects run their functions in `fra1` (Frankfurt), next to the Neon database in `eu-central-1`, so database queries stay in one region.
+- The CMS sets `serverURL` from `CMS_URL` and only accepts cookie-authenticated requests (the admin) from that origin and the deployment's own URL (`csrf`). The site uses API keys, which the check does not cover.
 - Every variable is listed in the README.
 
 ## Tests

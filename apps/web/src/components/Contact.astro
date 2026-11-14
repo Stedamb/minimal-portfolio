@@ -1,4 +1,5 @@
 ---
+import { actions } from 'astro:actions';
 import ArrowLink from './ArrowLink.astro';
 import Photo from './Photo.astro';
 import { t, type Locale } from '../lib/i18n';
@@ -64,7 +65,7 @@ const field = 'w-full border border-text bg-background p-2 font-primary';
             <p id="contact-error" data-contact-error role="alert" hidden={!errorMessage} class="pt-4">
               {errorMessage}
             </p>
-            <form method="POST" action="?_action=contact" data-contact-form class="flex flex-col gap-4 pt-4">
+            <form method="POST" action={actions.contact} data-contact-form class="flex flex-col gap-4 pt-4">
               <input type="hidden" name={LOCALE_FIELD} value={locale} />
               <input type="hidden" name={TOKEN_FIELD} value={token} />
               <div class="sr-only" aria-hidden="true">

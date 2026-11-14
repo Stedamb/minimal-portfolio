@@ -5,10 +5,8 @@ import ContentSection from '../components/sections/ContentSection.astro';
 import NavSection from '../components/sections/NavSection.astro';
 import { t, type Locale } from '../lib/i18n';
 import type { ProfileView, ProjectView } from '../lib/mappers';
-import { cachePage, mediaTagsOf, pageTags } from '../lib/cache';
 
-// The route loads the data: Astro starts streaming once a component awaits, so cache headers
-// set after an await in a nested component would never reach the response.
+// The route loads the data and sets the cache headers: Astro only lets pages change the response.
 interface Props {
   locale: Locale;
   profile: ProfileView;
@@ -19,7 +17,6 @@ interface Props {
 }
 
 const { locale, profile, projects, preview = false } = Astro.props;
-if (!preview) cachePage(Astro.cache, pageTags.home(locale), mediaTagsOf([profile.photo, profile.hero, ...projects.map((p) => p.cover)]));
 ---
 
 <PageLayout title={t(locale).titles.home} locale={locale} profile={profile} showLoader={!preview} preview={preview}>
