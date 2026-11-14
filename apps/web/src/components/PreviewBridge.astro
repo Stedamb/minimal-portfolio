@@ -9,6 +9,7 @@ const { cmsUrl } = Astro.props;
 <div hidden data-live-preview data-cms-url={cmsUrl}></div>
 
 <script>
+  import { initAsciiHero } from '../scripts/ascii-hero';
   import { initCursor } from '../scripts/cursor';
   import { initGallery } from '../scripts/gallery';
   import { initHeroVideo } from '../scripts/hero-video';
@@ -22,6 +23,7 @@ const { cmsUrl } = Astro.props;
       cmsUrl,
       afterSwap: () => {
         initLazyVideos();
+        initAsciiHero();
         initHeroVideo();
         initGallery();
         initMarquee();

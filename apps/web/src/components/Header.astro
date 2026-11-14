@@ -15,20 +15,27 @@ const { hero, marquee, locale } = Astro.props;
 ---
 
 <div>
-  <div class="container-min h-[70vh] lg:h-[80vh] lazyload">
-    {
-      hero?.kind === 'video' ? (
-        <LazyVideo video={hero} locale={locale} class="cursor-hover play-pause" data-hero-video />
-      ) : hero ? (
-        <Photo photo={hero} sizes="100vw" loading="eager" />
-      ) : null
-    }
+  <!-- An ASCII skyline drawn by a shader. The hero media from the CMS is the fallback when
+       WebGL is unavailable; while hidden it does not load (lazy image, lazy video). -->
+  <div class="container-min h-[70vh] lg:h-[80vh] relative lazyload" data-ascii-hero>
+    <canvas class="absolute inset-0 w-full h-full" aria-hidden="true"></canvas>
+    <div class="absolute inset-0" data-ascii-fallback hidden>
+      {
+        hero?.kind === 'video' ? (
+          <LazyVideo video={hero} locale={locale} class="cursor-hover play-pause" data-hero-video />
+        ) : hero ? (
+          <Photo photo={hero} sizes="100vw" />
+        ) : null
+      }
+    </div>
   </div>
   <MovingText items={marquee} />
 </div>
 
 <script>
+  import { initAsciiHero } from '../scripts/ascii-hero';
   import { initHeroVideo } from '../scripts/hero-video';
 
+  initAsciiHero();
   initHeroVideo();
 </script>
