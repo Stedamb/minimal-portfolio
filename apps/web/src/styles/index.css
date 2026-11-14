@@ -46,6 +46,9 @@
     color: var(--text);
     background-color: var(--background);
 
+    /* How far a box title (.Box-Title) hangs below the top border of its box. */
+    --box-title-overlap: calc(0.75rem + 2px);
+
     /* Fonts */
     font-size: 12px !important;
 

@@ -165,3 +165,11 @@ a.Link:hover {
         background-position: 200% 50%;
     }
 }
+/* A heading sitting on the top border of a bordered box (project and contact cards).
+   The parent must be position: relative; the overlap is set once in :root. */
+.Box-Title {
+    position: absolute;
+    bottom: 100%;
+    left: 2rem;
+    transform: translateY(var(--box-title-overlap));
+}
